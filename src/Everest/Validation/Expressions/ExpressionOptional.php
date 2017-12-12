@@ -14,13 +14,13 @@ namespace Everest\Validation\Expressions;
 use Everest\Validation\TypeInterface;
 use Everest\Validation\TypeResult;
 
-class ExpressionRequired implements TypeInterface {
+class ExpressionOptional implements TypeInterface {
 
 	public const TRIM   = 1;
 	public const FILTER = 2;
 
 	/**
-	 * The type that is required
+	 * The type that is optional
 	 * @var Everest\Validation\TypeInterface
 	 */
 	
@@ -69,7 +69,7 @@ class ExpressionRequired implements TypeInterface {
 		}
 
 		if (empty($value)) {
-			return TypeResult::failure($name, '\'%s\' is empty but required.');
+			return TypeResult::success($name, $value);
 		}
 
 		return $this->type->execute($name, $value);
@@ -81,6 +81,6 @@ class ExpressionRequired implements TypeInterface {
 
 	public function getName() : string
 	{
-		return 'required';
+		return 'optional';
 	}
 }
