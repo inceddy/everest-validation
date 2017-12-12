@@ -112,10 +112,17 @@ final class Type {
   
   public static function __callStatic($name, $arguments) 
   {
-    $optional = false;
+    $optional = 
+    $required = false;
+
     $name = strtolower($name);
 
     if (0 === strpos($name, 'required')) {
+      $required = true;
+      $name = substr($name, 8);
+    }
+
+    else if (0 === strpos($name, 'optional')) {
       $optional = true;
       $name = substr($name, 8);
     }
@@ -137,6 +144,13 @@ final class Type {
       $type = new $className(...$arguments);
     }
 
-    return $optional ? new ExpressionRequired($type) : $type;
+    if ($optional) {
+      $type = new Expressions\ExpressionOptional($type);
+    }
+    elseif ($required) {
+      $type = new Expressions\ExpressionRequired($type);
+    }
+
+    return $type;
   }
 }

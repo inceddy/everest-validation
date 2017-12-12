@@ -8,7 +8,8 @@ use Everest\Validation\Types\{
 use Everest\Validation\Expressions\{
 	ExpressionAnd,
 	ExpressionOr,
-	ExpressionRequired
+	ExpressionRequired,
+	ExpressionOptional
 };
 
 
@@ -22,11 +23,31 @@ class ExpressionsTest extends \PHPUnit_Framework_TestCase {
 
 	public function testOptional()
 	{
+		$type = new ExpressionOptional(new TypeInt);
+
+		$this->assertTrue($type->execute('name', null)->isValid());
+		$this->assertTrue($type->execute('name', '')->isValid());
+		$this->assertTrue($type->execute('name', [])->isValid());
+
+		$type = new ExpressionOptional(new TypeInt, ExpressionOptional::FILTER | ExpressionOptional::TRIM);
+		$this->assertTrue($type->execute('name', '   ')->isValid());
+		$this->assertTrue($type->execute('name', [null, ''])->isValid());
+
+
+		$this->assertTrue($type->execute('name', 19)->isValid());
+	}
+
+	public function testRequired()
+	{
 		$type = new ExpressionRequired(new TypeInt);
 
 		$this->assertFalse($type->execute('name', null)->isValid());
 		$this->assertFalse($type->execute('name', '')->isValid());
 		$this->assertFalse($type->execute('name', [])->isValid());
+
+		$type = new ExpressionRequired(new TypeInt, ExpressionRequired::FILTER | ExpressionRequired::TRIM);
+		$this->assertFalse($type->execute('name', '   ')->isValid());
+		$this->assertFalse($type->execute('name', [null, ''])->isValid());
 
 
 		$this->assertTrue($type->execute('name', 19)->isValid());
