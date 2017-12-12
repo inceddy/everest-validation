@@ -34,7 +34,7 @@ final class TypeResult {
 
   private function __construct(string $name, bool $valid, $transformed = null, $error = null)
   {
-    $this->name;
+    $this->name = $name;
     $this->valid = $valid;
     $this->transformed = $transformed;
     $this->error = $error;
