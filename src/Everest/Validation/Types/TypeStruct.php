@@ -19,8 +19,7 @@ use LogicException;
 class TypeStruct implements TypeInterface {
 
   private const FAIL_NOT_ARRAY  = 1;
-  private const FAIL_NOT_SET    = 2;
-  private const FAIL_WRONG_TYPE = 3;
+  private const FAIL_WRONG_TYPE = 2;
 
   private $types;
 
@@ -57,10 +56,6 @@ class TypeStruct implements TypeInterface {
         case self::FAIL_NOT_ARRAY:
           return sprintf('\'%s\' is not an array.', $name);
 
-        case self::FAIL_NOT_SET:
-          [$key, $type] = $args;
-          return sprintf('\'%s[%s] is not set. Expected %s', $name, $key, $type->getName());
-
         case self::FAIL_WRONG_TYPE:
           [$key, $result] = $args;
           return sprintf(
@@ -84,11 +79,7 @@ class TypeStruct implements TypeInterface {
 
     $transformed = [];
     foreach ($this->types as $key => $type) {
-      if (!array_key_exists($key, $values)) {
-        return $this->fail($name, self::FAIL_NOT_SET, $key, $type);
-      }
-
-      if (!($result = $type->execute($key, $values[$key]))->isValid()) {
+      if (!($result = $type->execute($key, $values[$key] ?? null))->isValid()) {
         return $this->fail($name, self::FAIL_WRONG_TYPE, $key, $result);
       }
 
