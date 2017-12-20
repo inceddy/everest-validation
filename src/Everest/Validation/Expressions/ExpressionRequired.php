@@ -69,7 +69,7 @@ class ExpressionRequired implements TypeInterface {
 		}
 
 		if (empty($value)) {
-			return TypeResult::failure($name, '\'%s\' is empty but required.');
+			return TypeResult::failure($name, $this->getName(), '\'%s\' is empty but required.');
 		}
 
 		return $this->type->execute($name, $value);

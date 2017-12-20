@@ -35,7 +35,7 @@ class ExpressionOr implements TypeInterface {
 			}
 		}
 
-		return TypeResult::failure($name, function($name) {
+		return TypeResult::failure($name, $this->getName(), function($name) {
 			sprtinf(
 				'\'%s\' statisfy one of the following types [%s].', 
 				$name, 

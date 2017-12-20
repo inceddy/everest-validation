@@ -21,10 +21,10 @@ class TypeDateTimeTest extends \PHPUnit_Framework_TestCase {
 
 		// Success
 		$this->assertTrue(($result = $type->execute('name', '1990-10-21'))->isValid());
-		$this->assertEmpty($result->getErrorMessage());
+		$this->assertEmpty($result->getErrorDescription());
 		$this->assertInstanceOf(\DateTimeInterface::CLASS, $result->getTransformed());
 		$this->assertFalse(($result = $type->execute('name', new stdClass))->isValid());
-		$this->assertNotEmpty($result->getErrorMessage());
+		$this->assertNotEmpty($result->getErrorDescription());
 	}
 
 	public function testInvalidConstruction()

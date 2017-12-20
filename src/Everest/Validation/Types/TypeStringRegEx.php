@@ -85,7 +85,7 @@ class TypeStringRegEx extends TypeString {
     
     return $valid ?
       ($this->options & self::RETURN_MATCHES ? $result->withTransformed($matches) : $result) :
-      TypeResult::failure($name, function($name) {
+      TypeResult::failure($name, 'string_regex', function($name) {
         return sprintf('\'%s\' does not match pattern %s.', $name, $this->pattern);
       });
   }

@@ -42,7 +42,7 @@ class TypeEnum extends TypeString {
 
 		return array_key_exists($value, $this->values) ?
 			TypeResult::success($name, $this->values[$value]) :
-			TypeResult::failure($name, function($name) use ($value) {
+			TypeResult::failure($name, $this->getName(), function($name) use ($value) {
 				return sprintf(
 					'\'%s[%s]\' does not exist in the enum. Use one of [%s]',
 					$name, $value, implode(', ', array_keys($this->values))

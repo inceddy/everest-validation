@@ -24,11 +24,11 @@ class TypeStringTest extends \PHPUnit_Framework_TestCase {
 		$this->assertTrue($type->execute('name', '')->isValid());
 		$result = $type->execute('name', 'Foo');
 		$this->assertTrue($result->isValid());
-		$this->assertEmpty($result->getErrorMessage());
+		$this->assertEmpty($result->getErrorDescription());
 		// Failure
 		$result = $type->execute('name', 10);
 		$this->assertFalse($result->isValid());
-		$this->assertNotEmpty($result->getErrorMessage());
+		$this->assertNotEmpty($result->getErrorDescription());
 	}
 
 	public function testTransformWithOptionTrim()

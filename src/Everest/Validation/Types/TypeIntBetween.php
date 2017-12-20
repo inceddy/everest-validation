@@ -48,7 +48,7 @@ class TypeIntBetween extends TypeInt {
 
     return ($this->min <= $value && $value <= $this->max) ?
       $result :
-      TypeResult::failure($name, function($name){
+      TypeResult::failure($name, 'int_between', function($name){
         return sprintf(
           'The value of \'%s\' is not between %s and %s.', 
           $name, $this->min, $this->max

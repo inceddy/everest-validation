@@ -49,7 +49,7 @@ class TypeStringLength extends TypeString {
 
     return $valid ?
       $result : 
-      TypeResult::failure($name, function($name) use ($min, $max) {
+      TypeResult::failure($name, $this->getName(), function($name) use ($min, $max) {
         switch (true) {
           case !$min:
             return sprintf('\'%s\' must be longer than %s.', $name, $this->min);

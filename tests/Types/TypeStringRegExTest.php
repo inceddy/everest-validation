@@ -24,18 +24,18 @@ class TypeRegExTest extends \PHPUnit_Framework_TestCase {
 		// Success
 		$result = $type->execute('name', 'FooBar'); 
 		$this->assertTrue($result->isValid());
-		$this->assertEmpty($result->getErrorMessage());
+		$this->assertEmpty($result->getErrorDescription());
 		$this->assertEquals('FooBar', $result->getTransformed());
 
 		// Failure (no string)
 		$result = $type->execute('name', 10);
 		$this->assertFalse($result->isValid());
-		$this->assertNotEmpty($result->getErrorMessage());
+		$this->assertNotEmpty($result->getErrorDescription());
 
 		// Failure (no match)
 		$result = $type->execute('name', 'FooBarFoo');
 		$this->assertFalse($result->isValid());
-		$this->assertNotEmpty($result->getErrorMessage());
+		$this->assertNotEmpty($result->getErrorDescription());
 	}
 
 	public function testExecutionWithOptionReturnMatches()

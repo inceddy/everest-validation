@@ -18,8 +18,8 @@ use LogicException;
 
 class TypeStruct implements TypeInterface {
 
-  private const FAIL_NOT_ARRAY  = 1;
-  private const FAIL_WRONG_TYPE = 2;
+  private const FAIL_NOT_ARRAY  = 'not_array';
+  private const FAIL_WRONG_TYPE = 'wrong_type';
 
   private $types;
 
@@ -49,9 +49,9 @@ class TypeStruct implements TypeInterface {
     $this->types = $types;
   }
 
-  private function fail(string $name, int $reason, ... $args) : TypeResult
+  private function fail(string $name, string $reason, ... $args) : TypeResult
   {
-    return TypeResult::failure($name, function($name) use ($reason, $args){
+    return TypeResult::failure($name, $reason, function($name) use ($reason, $args){
       switch ($reason) {
         case self::FAIL_NOT_ARRAY:
           return sprintf('\'%s\' is not an array.', $name);
@@ -60,7 +60,7 @@ class TypeStruct implements TypeInterface {
           [$key, $result] = $args;
           return sprintf(
             'Wrong type for \'%s[%s]\': %s.', 
-            $name, $key, $result->getErrorMessage()
+            $name, $key, $result->getErrorDescription()
           );
       }
     });

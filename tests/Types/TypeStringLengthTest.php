@@ -23,15 +23,15 @@ class TypeStringLengthTest extends \PHPUnit_Framework_TestCase {
 		// Success
 		$result = $type->execute('name', 'abcde');
 		$this->assertTrue($result->isValid());
-		$this->assertEmpty($result->getErrorMessage());
+		$this->assertEmpty($result->getErrorDescription());
 		// Failure (min)
 		$result = $type->execute('name', 'ab');
 		$this->assertFalse($result->isValid());
-		$this->assertNotEmpty($result->getErrorMessage());
+		$this->assertNotEmpty($result->getErrorDescription());
 		// Failure (max)
 		$result = $type->execute('name', 'abcdefghijklmnop');
 		$this->assertFalse($result->isValid());
-		$this->assertNotEmpty($result->getErrorMessage());
+		$this->assertNotEmpty($result->getErrorDescription());
 		// Failure no string
 		$this->assertFalse($type->execute('name', 10)->isValid());
 	}

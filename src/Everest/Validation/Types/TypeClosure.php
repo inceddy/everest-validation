@@ -56,7 +56,7 @@ class TypeClosure implements TypeInterface {
   {
     return ($this->validator)($value) ?
       TypeResult::success($name, $this->transform ? ($this->transform)($value) : $value) : 
-      TypeResult::failure($name, $this->errorMessageResolver ?: function($name){
+      TypeResult::failure($name, $this->getName(), $this->errorMessageResolver ?: function($name){
         return 'An unspecified error occured validating ' . $name;
       });
   }

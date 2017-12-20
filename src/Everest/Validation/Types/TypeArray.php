@@ -18,8 +18,8 @@ class TypeArray implements TypeInterface {
 
 	public const FILTER = 1;
 
-	private const FAIL_NOT_ARRAY  = 1;
-	private const FAIL_WRONG_TYPE = 2;
+	private const FAIL_NOT_ARRAY  = 'not_array';
+	private const FAIL_WRONG_TYPE = 'wrong_type';
 
 	private $type;
 
@@ -36,9 +36,9 @@ class TypeArray implements TypeInterface {
 	 * @return bool
 	 */
 	
-	private function fail(string $name, int $reason, ... $arguments) : TypeResult
+	private function fail(string $name, string $reason, ... $arguments) : TypeResult
 	{
-		return TypeResult::failure($name, function($name) use ($reason, $arguments){
+		return TypeResult::failure($name, $reason, function($name) use ($reason, $arguments){
 			switch ($reason) {
 				case self::FAIL_NOT_ARRAY:
 					return sprintf('\'%s\' is not an array.', $name);
@@ -46,7 +46,7 @@ class TypeArray implements TypeInterface {
 				case self::FAIL_WRONG_TYPE:
 					return sprintf(
 						'Wront type for \'%s[%s]\': %s.', 
-						$name, $arguments[0], $arguments[1]->getErrorMessage()
+						$name, $arguments[0], $arguments[1]->getErrorDescription()
 					);
 			}
 		});

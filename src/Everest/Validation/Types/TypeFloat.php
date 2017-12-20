@@ -23,7 +23,7 @@ class TypeFloat implements TypeInterface {
 	{
 		return is_numeric($value) ?
 			TypeResult::success($name, (float)$value) : 
-			TypeResult::failure($name, '%s is not a valid float.');
+			TypeResult::failure($name, $this->getName(), '%s is not a valid float.');
 	}
 
 

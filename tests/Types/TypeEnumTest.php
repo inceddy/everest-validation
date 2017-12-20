@@ -21,10 +21,10 @@ class TypeEnumTest extends \PHPUnit_Framework_TestCase {
 
 		// Success
 		$this->assertTrue(($result = $type->execute('name', 'B'))->isValid());
-		$this->assertEmpty($result->getErrorMessage());
+		$this->assertEmpty($result->getErrorDescription());
 		$this->assertEquals(10, $result->getTransformed());
 		$this->assertFalse(($result = $type->execute('name', 'C'))->isValid());
-		$this->assertNotEmpty($result->getErrorMessage());
+		$this->assertNotEmpty($result->getErrorDescription());
 	}
 
 	public function testInvalidConstruction()

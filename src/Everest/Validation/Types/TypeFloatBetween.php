@@ -36,7 +36,7 @@ class TypeFloatBetween extends TypeFloat {
 
 		return ($this->min <= $value && $value <= $this->max) ?
 			$result :
-			TypeResult::failure($name, function($name){
+			TypeResult::failure($name, 'float_between', function($name){
 				return sprintf(
 					'The value of \'%s\' is not between %s and %s.', 
 					$name, $this->min, $this->max

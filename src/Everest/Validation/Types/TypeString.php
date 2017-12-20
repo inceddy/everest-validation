@@ -42,7 +42,7 @@ class TypeString implements TypeInterface {
 	public function execute(string $name, $value) : TypeResult
 	{
 		if (!is_string($value)) {
-			return TypeResult::failure($name, '\'%s\' is not a string.');
+			return TypeResult::failure($name, $this->getName(), '\'%s\' is not a string.');
 		}
 
 		if ($this->options & self::TRIM) {

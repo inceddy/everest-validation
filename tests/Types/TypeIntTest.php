@@ -21,11 +21,11 @@ class TypeIntTest extends \PHPUnit_Framework_TestCase {
 
 		// Success
 		$this->assertTrue(($result = $type->execute('name', '10'))->isValid());
-		$this->assertEmpty($result->getErrorMessage());
+		$this->assertEmpty($result->getErrorDescription());
 		$this->assertEquals(10, $result->getTransformed());
 		// Failure
 		$this->assertFalse(($result = $type->execute('name', 'C'))->isValid());
-		$this->assertNotEmpty($result->getErrorMessage());
+		$this->assertNotEmpty($result->getErrorDescription());
 		$this->assertFalse($type->execute('name', 10.1)->isValid());
 	}
 }

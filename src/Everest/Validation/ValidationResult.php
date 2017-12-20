@@ -14,32 +14,49 @@ namespace Everest\Validation;
 
 final class ValidationResult {
 
-  private $success;
+  private $typeResults = [];
 
-  private $failure;
-
-  public function __construct(array $success, array $failure)
+  public function addTypeResult(TypeResult $result)
   {
-    $this->success = $success;
-    $this->failure = $failure;
+    $this->typeResults[$result->getName()] = $result;
+    return $this;
+  }
+
+  public function getTypeResult(string $name)
+  {
+    return $this->typeResults[$name] ?? null;
   }
 
   public function isValid() : bool
   {
-    return empty($this->failure);
+    foreach ($this->typeResults as $result) {
+      if (!$result->isValid()) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   public function errors() : array
   {
     return array_map(function($result) {
-      return $result->getErrorMessage();
-    }, $this->failure);
+      return [
+        'name' => $result->getErrorName(),
+        'description' => $result->getErrorDescription()
+
+      ];
+    }, array_filter($this->typeResults, function($result){
+      return !$result->isValid();
+    }));
   }
 
   public function values() : array
   {
     return array_map(function($result){
       return $result->getTransformed();
-    }, $this->success);
+    }, array_filter($this->typeResults, function($result){
+      return $result->isValid();
+    }));
   }
 }

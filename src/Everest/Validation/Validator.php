@@ -106,16 +106,15 @@ final class Validator {
       );
     }
 
-    $failure =
-    $success = [];
+    $validationResult = new ValidationResult;
 
     foreach ($this->types as $name => $type) {
       $value = $store[$name] ?? $this->initials[$name] ?? null;
-      ($result = $type->execute($name, $value))->isValid() ?
-        $success[$name] = $result :
-        $failure[$name] = $result;
+      $validationResult->addTypeResult(
+        $type->execute($name, $value, $validationResult)
+      );
     }
 
-    return new ValidationResult($success, $failure);
+    return $validationResult;
   }
 }

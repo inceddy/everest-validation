@@ -32,7 +32,7 @@ class TypeStructTest extends \PHPUnit_Framework_TestCase {
 			'c' => [1, '2']
 		]);
 		$this->assertTrue($result->isValid());
-		$this->assertEmpty($result->getErrorMessage());
+		$this->assertEmpty($result->getErrorDescription());
 		$this->assertEquals([
 			'a' => 10,
 			'b' => 'Foo',
@@ -45,16 +45,16 @@ class TypeStructTest extends \PHPUnit_Framework_TestCase {
 			'c' => ['Foo']
 		]);
 		$this->assertFalse($result->isValid());
-		$this->assertNotEmpty($result->getErrorMessage());
+		$this->assertNotEmpty($result->getErrorDescription());
 
 		// Failure (untyped)
 		$result = $type->execute('name', ['d' => null]);
 		$this->assertFalse($result->isValid());
-		$this->assertNotEmpty($result->getErrorMessage());
+		$this->assertNotEmpty($result->getErrorDescription());
 		// Failure (not array)
 		$result = $type->execute('name', 10);
 		$this->assertFalse($result->isValid());
-		$this->assertNotEmpty($result->getErrorMessage());
+		$this->assertNotEmpty($result->getErrorDescription());
 	}
 
 	public function testInvalidConstructionEmpty()

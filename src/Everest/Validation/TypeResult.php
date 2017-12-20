@@ -14,35 +14,76 @@ namespace Everest\Validation;
 
 final class TypeResult {
 
-  private $name;
-
+  /**
+   * State of this result
+   * @var bool
+   */
+  
   private $valid;
 
+  /**
+   * The name of the validated value
+   * @var string
+   */
+  
+  private $name;
+
+  /**
+   * The transformed value
+   * @var mixed
+   */
+  
   private $transformed;
 
-  private $error;
+  /**
+   * The error name or `null` if valid
+   * @var string
+   */
+  
+  private $errorName;
+
+  /**
+   * The error description or `null` if valid
+   * @var string
+   */
+  
+  private $errorDescription;
 
   public static function success(string $name, $transformed)
   {
     return new self($name, true, $transformed);
   }
 
-  public static function failure(string $name, $error)
+  public static function failure(string $name, string $errorName, $errorDescription)
   {
-    return new self($name, false, null, $error);
+    return new self($name, false, null, $errorName, $errorDescription);
+
   }
 
-  private function __construct(string $name, bool $valid, $transformed = null, $error = null)
+  private function __construct(
+    string $name, 
+    bool $valid, 
+    $transformed = null, 
+    string $errorName = null, 
+    $errorDescription = null
+  )
   {
     $this->name = $name;
     $this->valid = $valid;
     $this->transformed = $transformed;
-    $this->error = $error;
+
+    $this->errorName = $errorName;
+    $this->errorDescription = $errorDescription;
   }
 
   public function isValid() : bool
   {
     return $this->valid;
+  }
+
+  public function getName() : string
+  {
+    return $this->name;
   }
 
 
@@ -77,6 +118,11 @@ final class TypeResult {
     return $new;
   }
 
+  public function getErrorName() :? string
+  {
+    return $this->errorName;
+  }
+
   /**
    * Returns the error message on a failed test
    * for the given name.
@@ -91,16 +137,20 @@ final class TypeResult {
    *    The error message or empty string if no error occured
    */
 
-  public function getErrorMessage() : string
+  public function getErrorDescription() :? string
   {
     if ($this->isValid()) {
-      return '';
+      return null;
     }
 
-    if (is_string($this->error)) {
-      return sprintf($this->error, $this->name);
+    if (is_string($this->errorDescription)) {
+      return sprintf($this->errorDescription, $this->name);
     }
 
-    return ($this->error)($this->name);
+    if (is_callable($this->errorDescription)) {
+      return call_user_func($this->errorDescription, $this->name);
+    }
+
+    throw new \InvalidArgumentException('Error message MUST be a string or callable.');
   }
 }

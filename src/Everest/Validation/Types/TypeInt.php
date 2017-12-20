@@ -23,7 +23,7 @@ class TypeInt implements TypeInterface {
 	{
 		return is_numeric($value) && floatval($value) == intval($value) ?
 			TypeResult::success($name, (int) $value) :
-			TypeResult::failure($name, '\'%s\' is not a valid integer.');
+			TypeResult::failure($name, $this->getName(), '\'%s\' is not a valid integer.');
 	}
 
 

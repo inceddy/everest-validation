@@ -28,17 +28,17 @@ class TypeArrayTest extends \PHPUnit_Framework_TestCase {
 
 		$result = $type->execute('name', ['Foo', 'Bar']);
 		$this->assertTrue($result->isValid());
-		$this->assertEmpty($result->getErrorMessage());
+		$this->assertEmpty($result->getErrorDescription());
 		
 		// Failure (base type)
 		$result = $type->execute('name', 'foo');
 		$this->assertFalse($result->isValid());
-		$this->assertNotEmpty($result->getErrorMessage());
+		$this->assertNotEmpty($result->getErrorDescription());
 
 		// Failure (sub type)
 		$result = $type->execute('name', [10]);
 		$this->assertFalse($result->isValid());
-		$this->assertNotEmpty($result->getErrorMessage());
+		$this->assertNotEmpty($result->getErrorDescription());
 	}
 
 	public function testExecutionWithOptionTrim()

@@ -73,6 +73,8 @@ final class Type {
   
   public static function addType(string $name, string $typeClassName, bool $overload = false)
   {
+    $name = strtolower($name);
+    
     if (!$overload && isset(self::$typeMap[$name])) {
       throw new RuntimeException('Trying to overload type without setting overload flag.');
     }

@@ -32,16 +32,15 @@ class TypeClosureTest extends \PHPUnit_Framework_TestCase {
 		// Success
 		$result = $type->execute('name', 100);
 		$this->assertTrue($result->isValid());
-		$this->assertEmpty($result->getErrorMessage());
+		$this->assertEmpty($result->getErrorDescription());
 		// Failure
 		$result = $type->execute('name', 0);
 		$this->assertFalse($result->isValid());
-		$this->assertNotEmpty($result->getErrorMessage());
+		$this->assertNotEmpty($result->getErrorDescription());
 	}
 
 	public function testTransform()
 	{
-		// Trim is default option
 		$type = new TypeClosure(function($value){
 			return true;
 		}, function(int $value) {

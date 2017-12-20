@@ -44,7 +44,7 @@ class TypeDateTime implements TypeInterface {
 	{
 		return (is_string($value) && $transformed = $this->targetClass::createFromFormat($this->format, $value)) ? 
 			TypeResult::success($name, $transformed) :
-			TypeResult::failure($name, function($name){
+			TypeResult::failure($name, $this->getName(), function($name){
 				return sprintf('\'%s\' is not a valid date/time of format %s', $name, $this->format);
 			});
 	}
