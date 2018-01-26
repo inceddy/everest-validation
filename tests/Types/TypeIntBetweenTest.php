@@ -2,7 +2,7 @@
 use Everest\Validation\Type;
 use Everest\Validation\Types\TypeIntBetween;
 
-class TypeIntBetweenTest extends \PHPUnit_Framework_TestCase {
+class TypeIntBetweenTest extends \PHPUnit\Framework\TestCase {
 
 	public function testConstructionFromBaseType()
 	{

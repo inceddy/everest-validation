@@ -2,7 +2,7 @@
 use Everest\Validation\Type;
 use Everest\Validation\Types\TypeFloat;
 
-class TypeFloatTest extends \PHPUnit_Framework_TestCase {
+class TypeFloatTest extends \PHPUnit\Framework\TestCase {
 
 	public function testConstructionFromBaseType()
 	{

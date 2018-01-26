@@ -2,7 +2,7 @@
 use Everest\Validation\Type;
 use Everest\Validation\Types\TypeDateTime;
 
-class TypeDateTimeTest extends \PHPUnit_Framework_TestCase {
+class TypeDateTimeTest extends \PHPUnit\Framework\TestCase {
 
 	public function testConstructionFromBaseType()
 	{

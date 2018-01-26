@@ -16,7 +16,7 @@ use Everest\Validation\Expressions\{
  * @author  Philipp Steingrebe <philipp@steingrebe.de>
  */
 
-class TypeTest extends \PHPUnit_Framework_TestCase {
+class TypeTest extends \PHPUnit\Framework\TestCase {
 
 	public function testAutoRequired()
 	{

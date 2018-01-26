@@ -4,7 +4,7 @@ use Everest\Validation\Type;
 use Everest\Validation\Types\TypeStringRegEx;
 
 
-class TypeRegExTest extends \PHPUnit_Framework_TestCase {
+class TypeRegExTest extends \PHPUnit\Framework\TestCase {
 
 	public function testConstructionFromBaseType()
 	{

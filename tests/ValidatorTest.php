@@ -12,7 +12,7 @@ use Everest\Validation\Types\{
  * @author  Philipp Steingrebe <philipp@steingrebe.de>
  */
 
-class ValidatorTest extends \PHPUnit_Framework_TestCase {
+class ValidatorTest extends \PHPUnit\Framework\TestCase {
 
 	public function testValidatorSuccess()
 	{

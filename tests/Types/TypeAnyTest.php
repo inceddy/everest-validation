@@ -2,7 +2,7 @@
 use Everest\Validation\Type;
 use Everest\Validation\Types\TypeAny;
 
-class TypeAnyTest extends \PHPUnit_Framework_TestCase {
+class TypeAnyTest extends \PHPUnit\Framework\TestCase {
 
 	public function testConstructionFromBaseType()
 	{

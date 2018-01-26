@@ -4,7 +4,7 @@ use Everest\Validation\Type;
 use Everest\Validation\Types\TypeClosure;
 
 
-class TypeClosureTest extends \PHPUnit_Framework_TestCase {
+class TypeClosureTest extends \PHPUnit\Framework\TestCase {
 
   public function __construct(... $arguments) {
   	parent::__construct(... $arguments);

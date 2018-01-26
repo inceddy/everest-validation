@@ -7,7 +7,7 @@ use Everest\Validation\Types\{
 };
 
 
-class TypeArrayTest extends \PHPUnit_Framework_TestCase {
+class TypeArrayTest extends \PHPUnit\Framework\TestCase {
 
 	public function testConstructionFromBaseType()
 	{

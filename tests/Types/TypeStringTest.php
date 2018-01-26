@@ -4,7 +4,7 @@ use Everest\Validation\Type;
 use Everest\Validation\Types\TypeString;
 
 
-class TypeStringTest extends \PHPUnit_Framework_TestCase {
+class TypeStringTest extends \PHPUnit\Framework\TestCase {
 
 	public function testConstructionFromBaseType()
 	{

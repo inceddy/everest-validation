@@ -2,7 +2,7 @@
 use Everest\Validation\Type;
 use Everest\Validation\Types\TypeEnum;
 
-class TypeEnumTest extends \PHPUnit_Framework_TestCase {
+class TypeEnumTest extends \PHPUnit\Framework\TestCase {
 
 	public function testConstructionFromBaseType()
 	{

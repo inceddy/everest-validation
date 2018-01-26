@@ -13,7 +13,7 @@ use Everest\Validation\Expressions\{
 };
 
 
-class ExpressionsTest extends \PHPUnit_Framework_TestCase {
+class ExpressionsTest extends \PHPUnit\Framework\TestCase {
 
 	public function testConstructionFromBaseType()
 	{

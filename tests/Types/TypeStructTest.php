@@ -4,7 +4,7 @@ use Everest\Validation\Type;
 use Everest\Validation\Types\TypeStruct;
 
 
-class TypeStructTest extends \PHPUnit_Framework_TestCase {
+class TypeStructTest extends \PHPUnit\Framework\TestCase {
 
 	public function testConstructionFromBaseType()
 	{

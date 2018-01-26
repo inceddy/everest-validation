@@ -2,7 +2,7 @@
 use Everest\Validation\Type;
 use Everest\Validation\Types\TypeInt;
 
-class TypeIntTest extends \PHPUnit_Framework_TestCase {
+class TypeIntTest extends \PHPUnit\Framework\TestCase {
 
 	public function testConstructionFromBaseType()
 	{
