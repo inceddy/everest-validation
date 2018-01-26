@@ -69,7 +69,7 @@ class ExpressionOptional implements TypeInterface {
 		}
 
 		if (empty($value)) {
-			return TypeResult::success($name, $value);
+			return TypeResult::success($name, null);
 		}
 
 		return $this->type->execute($name, $value);
