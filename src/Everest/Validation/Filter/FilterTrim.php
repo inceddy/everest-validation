@@ -13,7 +13,7 @@
 namespace Everest\Validation\Filter;
 
 
-class Trim
+class FilterTrim
 {
 	public function __invoke(string $value)
 	{
