@@ -18,7 +18,7 @@ namespace Everest\Validation;
  * @package Everest\Http
  */
 
-final class ValidationChain {
+class ValidationChain {
 
 	/**
 	 * Stack of closures, that call the validions
@@ -26,6 +26,8 @@ final class ValidationChain {
 	 */
 	
 	private $validations = [];
+
+	private $valid = true;
 
 	/**
 	 * Indecates if null is a valid value
@@ -67,14 +69,24 @@ final class ValidationChain {
 		$this->message = $message;
 	}
 
+	public function getKey()
+	{
+		return $this->key;
+	}
+
+	public function getMessage()
+	{
+		return $this->message;
+	}
+
 	/**
-	 * Set all to true
+	 * Run all validations even
+	 * if one already failed.
 	 */
 	
 	public function all()
 	{
 		$this->all = true;
-		return $this;
 	}
 
 	/**
@@ -85,6 +97,11 @@ final class ValidationChain {
 	public function allowNull()
 	{
 		$this->allowNull = true;
+	}
+
+	public function valid() : bool
+	{
+		return $this->valid;
 	}
 
 	/**
@@ -127,6 +144,7 @@ final class ValidationChain {
 				$value = $validation($value, $this->key, $this->message);
 			}
 			catch (InvalidValidationException $e) {
+				$this->valid = false;
 				yield $e;
 				if (!$this->all) {
 					break;
