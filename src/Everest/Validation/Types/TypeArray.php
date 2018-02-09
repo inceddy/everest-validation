@@ -11,80 +11,25 @@
 
 
 namespace Everest\Validation\Types;
-use Everest\Validation\TypeInterface;
-use Everest\Validation\TypeResult;
+use Everest\Validation\InvalidValidationException;
 
-class TypeArray implements TypeInterface {
+class TypeArray extends Type {
 
-	public const FILTER = 1;
+	public static $errorName = 'invalid_array';
+	public static $errorMessage = '%s is not a valid array';
 
-	private const FAIL_NOT_ARRAY  = 'not_array';
-	private const FAIL_WRONG_TYPE = 'wrong_type';
-
-	private $type;
-
-	private $filter;
-
-	public function __construct(TypeInterface $type, int $options = 0)
+	public function __invoke($value, $message = null, string $key = null)
 	{
-		$this->type = $type;
-		$this->filter = (bool)($options & self::FILTER);
-	}
+		if (!is_array($value)) {
 
-	/**
-	 * Set reason state and return false
-	 * @return bool
-	 */
-	
-	private function fail(string $name, string $reason, ... $arguments) : TypeResult
-	{
-		return TypeResult::failure($name, $reason, function($name) use ($reason, $arguments){
-			switch ($reason) {
-				case self::FAIL_NOT_ARRAY:
-					return sprintf('\'%s\' is not an array.', $name);
+			$message = sprintf(
+				static::generateErrorMessage($message ?: '%s is not a valid array'),
+				static::stringify($value)
+			);
 
-				case self::FAIL_WRONG_TYPE:
-					return sprintf(
-						'Wront type for \'%s[%s]\': %s.', 
-						$name, $arguments[0], $arguments[1]->getErrorDescription()
-					);
-			}
-		});
-	}
-
-
-	/**
-	 * {@inheritDoc}
-	 */
-
-	public function execute(string $name, $values) : TypeResult
-	{
-		// Validate array
-		if (!is_array($values)) {
-			return $this->fail($name, self::FAIL_NOT_ARRAY);
+			throw new InvalidValidationException(self::$errorName, $message, $key, $value);
 		}
 
-		$values = array_values($values);
-		$transformed = [];
-
-		if ($this->filter) {
-			$values = array_filter($values);
-		}
-
-		// Validate type
-		foreach ($values as $index => $value) {
-			if (!($result = $this->type->execute($index, $value))->isValid()) {
-				return $this->fail($name, self::FAIL_WRONG_TYPE, $index, $result);
-			}
-
-			$transformed[] = $result->getTransformed();
-		}
-
-		return TypeResult::success($name, $transformed);
-	}
-
-	public function getName() : string
-	{
-		return 'array';
+		return $value;
 	}
 }

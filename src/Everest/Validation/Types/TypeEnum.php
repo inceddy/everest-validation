@@ -10,48 +10,36 @@
  */
 
 namespace Everest\Validation\Types;
+use Everest\Validation\InvalidValidationException;
 
-use Everest\Validation\TypeInterface;
-use Everest\Validation\TypeResult;
-use InvalidArgumentException;
+class TypeEnum extends Type {
 
-class TypeEnum extends TypeString {
+	public static $errorName = 'invalid_enum';
+	public static $errorMessage = '%s is an invalid choice. Expected one of [%s].';
 
-	private $values;
-
-	public function __construct(array $values, int $options = TypeString::TRIM) 
+	public function __invoke($value, array $choices, $message = null, string $key = null)
 	{
-		if (empty($values)) {
-			throw new InvalidArgumentException('Values MUST NOT be empty.');
+		// Transform sequenz to assoc
+		if (empty(array_filter(array_keys($choices), 'is_string'))) {
+			$choices = array_combine($choices, $choices);
 		}
 
-		parent::__construct($options);
+		if (!array_key_exists((new TypeString)($value), $choices)) {
 
-		$this->values = $values;
-	}
+			$message = sprintf(
+				self::generateErrorMessage($message ?: self::$errorMessage),
+				self::stringify($value),
+				implode(', ', array_keys($choices))
+			);
 
+			throw new InvalidValidationException (
+				self::$errorName,
+				$message,
+				$key,
+				$value
+			);
+		}
 
-	/**
-	 * {@inheritDoc}
-	 */
-
-	public function execute(string $name, $value) : TypeResult
-	{
-		$result = parent::execute($name, $value);
-		$value = $result->getTransformed();
-
-		return array_key_exists($value, $this->values) ?
-			TypeResult::success($name, $this->values[$value]) :
-			TypeResult::failure($name, $this->getName(), function($name) use ($value) {
-				return sprintf(
-					'\'%s[%s]\' does not exist in the enum. Use one of [%s]',
-					$name, $value, implode(', ', array_keys($this->values))
-				);
-			});
-	}
-
-	public function getName() : string
-	{
-		return 'enum';
+		return $choices[$value];
 	}
 }

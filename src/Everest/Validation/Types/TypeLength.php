@@ -13,17 +13,18 @@
 namespace Everest\Validation\Types;
 use Everest\Validation\InvalidValidationException;
 
-class TypeString extends Type {
+class TypeLength extends Type {
 
-	public static $errorName = 'invalid_string';
-	public static $errorMessage = '%s is not a valid string';
+	public static $errorName = 'invalid_length';
+	public static $errorMessage = 'Length of %s is not %s.';
 
-	public function __invoke($value, $message = null, string $key = null)
+	public function __invoke($value, $length, $message = null, string $key = null)
 	{
-		if (!is_string($value)) {
+		if ($length != strlen($value)) {
 			$message = sprintf(
 				self::generateErrorMessage($message ?: self::$errorMessage),
-				self::stringify($value)
+				self::stringify($value),
+				self::stringify($length)
 			);
 
 			throw new InvalidValidationException(self::$errorName, $message, $key, $value);

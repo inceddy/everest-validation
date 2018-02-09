@@ -1,15 +1,14 @@
 <?php
-use Everest\Validation\Types\TypeFloat;
+use Everest\Validation\Types\TypeInteger;
 use Everest\Validation\InvalidValidationException;
 
-class TypeFloatTest extends \PHPUnit\Framework\TestCase {
+class TypeIntegerTest extends \PHPUnit\Framework\TestCase {
 
 	public function validInputProvider()
 	{
 		return [
-			[    0, 0.0],
-			[  5.1, 5.1],
-			['5.1', 5.1],
+			[  5, 5],
+			['5', 5],
 		];
 	}
 
@@ -17,7 +16,7 @@ class TypeFloatTest extends \PHPUnit\Framework\TestCase {
 	{
 		return [
 			[' '],
-			['5.1a'],
+			['5.1'],
 			[false]
 		];
 	}
@@ -28,8 +27,8 @@ class TypeFloatTest extends \PHPUnit\Framework\TestCase {
 	
 	public function testValidInput($input, $expected)
 	{
-		$value = (new TypeFloat)($input);
-		$this->assertSame($expected, $value);
+		$value = (new TypeInteger)($input);
+		$this->assertEquals($expected, $value);
 	}
 
 	/**
@@ -39,6 +38,6 @@ class TypeFloatTest extends \PHPUnit\Framework\TestCase {
 	public function testInvalidInput($input)
 	{
 		$this->expectException(InvalidValidationException::CLASS);
-		$value = (new TypeFloat)($input);
+		$value = (new TypeInteger)($input);
 	}
 }

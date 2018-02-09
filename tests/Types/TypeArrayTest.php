@@ -1,60 +1,18 @@
 <?php
-use Everest\Validation\Type;
-use Everest\Validation\Types\{
-	TypeArray,
-	TypeString,
-	TypeInt
-};
-
+use Everest\Validation\Types\TypeArray;
+use Everest\Validation\InvalidValidationException;
 
 class TypeArrayTest extends \PHPUnit\Framework\TestCase {
 
-	public function testConstructionFromBaseType()
+	public function testValidInput()
 	{
-		$this->assertInstanceOf(TypeArray::CLASS, Type::Array(Type::Int()));
+		$value = (new TypeArray)([1, 2, 'key' => 3]);
+		$this->assertEquals([1, 2, 'key' => 3], $value);
 	}
 
-	public function testInitialState()
+	public function testInvalidInput()
 	{
-		$type = new TypeArray(Type::Int());
-		$this->assertEquals('array', $type->getName());
-	}
-
-	public function testExecution()
-	{
-		$type = Type::Array(Type::String());
-		// Success
-		$this->assertTrue($type->execute('name', [])->isValid());
-
-		$result = $type->execute('name', ['Foo', 'Bar']);
-		$this->assertTrue($result->isValid());
-		$this->assertEmpty($result->getErrorDescription());
-		
-		// Failure (base type)
-		$result = $type->execute('name', 'foo');
-		$this->assertFalse($result->isValid());
-		$this->assertNotEmpty($result->getErrorDescription());
-
-		// Failure (sub type)
-		$result = $type->execute('name', [10]);
-		$this->assertFalse($result->isValid());
-		$this->assertNotEmpty($result->getErrorDescription());
-	}
-
-	public function testExecutionWithOptionTrim()
-	{
-		$type = Type::Array(Type::Int(), TypeArray::FILTER);
-
-		$result = $type->execute('name', [
-			10,
-			0,
-			false,
-			null,
-			''
-		]);
-
-		$this->assertEquals([
-			10
-		], $result->getTransformed());
+		$this->expectException(InvalidValidationException::CLASS);
+		$value = (new TypeArray)('no-array');
 	}
 }

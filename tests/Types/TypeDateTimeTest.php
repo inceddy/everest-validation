@@ -1,35 +1,26 @@
 <?php
-use Everest\Validation\Type;
 use Everest\Validation\Types\TypeDateTime;
+use Everest\Validation\InvalidValidationException;
 
 class TypeDateTimeTest extends \PHPUnit\Framework\TestCase {
 
-	public function testConstructionFromBaseType()
+	public function testValidInput()
 	{
-		$this->assertInstanceOf(TypeDateTime::CLASS, Type::DateTime());
+		$value = (new TypeDateTime)('2018.02.08', 'Y.m.d');
+		$this->assertInstanceOf(\DateTime::CLASS, $value);
+		$this->assertSame('2018.02.08', $value->format('Y.m.d'));
 	}
 
-	public function testInitialState()
+	public function testInvalidInput()
 	{
-		$type = new TypeDateTime;
-		$this->assertEquals('date_time', $type->getName());
+		$this->expectException(InvalidValidationException::CLASS);
+		$value = (new TypeDateTime)('2018.02.08', 'd.m.Y');
 	}
 
-	public function testExecution()
+	public function testInvalidInputWithCustomMessage()
 	{
-		$type = Type::DateTime('Y-m-d');
-
-		// Success
-		$this->assertTrue(($result = $type->execute('name', '1990-10-21'))->isValid());
-		$this->assertEmpty($result->getErrorDescription());
-		$this->assertInstanceOf(\DateTimeInterface::CLASS, $result->getTransformed());
-		$this->assertFalse(($result = $type->execute('name', new stdClass))->isValid());
-		$this->assertNotEmpty($result->getErrorDescription());
-	}
-
-	public function testInvalidConstruction()
-	{
-		$this->expectException(\Exception::CLASS);
-		new TypeDateTime('Y-m-d', \StdClass::CLASS);
+		$this->expectException(InvalidValidationException::CLASS);
+		$this->expectExceptionMessage('Not a german date');
+		$value = (new TypeDateTime)('2018.02.08', 'd.m.Y', 'Not a german date');
 	}
 }

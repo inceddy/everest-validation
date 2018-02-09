@@ -3,7 +3,7 @@
 /*
  * This file is part of Everest.
  *
- * (c) 2017 Philipp Steingrebe <development@steingrebe.de>
+ * (c) 2018 Philipp Steingrebe <development@steingrebe.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -11,51 +11,27 @@
 
 
 namespace Everest\Validation\Types;
+use Everest\Validation\InvalidValidationException;
 
-use Everest\Validation\TypeInterface;
-use Everest\Validation\TypeResult;
-use InvalidArgumentException;
-use Exception;
+class TypeDateTime extends Type {
 
-class TypeDateTime implements TypeInterface {
+	public static $errorName = 'invalid_datetime';
+	public static $errorMessage = '%s is not a valid date of format %s.';
 
-	private $format;
-
-	private $targetClass;
-
-	private $result;
-
-	public function __construct(string $format = \DateTime::ATOM, string $targetClass = \DateTime::CLASS)
+	public function __invoke($value, $format, $message = null, string $key = null)
 	{
-		if (!is_subclass_of($targetClass, \DateTimeInterface::CLASS)) {
-			throw new InvalidArgumentException('Target class MUST implement \\DateTimeInterface.');
+		$dateTime = \DateTime::createFromFormat($format, $value);
+
+		if (!$dateTime || $value !== $dateTime->format($format)) {
+			$message = sprintf(
+				self::generateErrorMessage($message ?: self::$errorMessage),
+				self::stringify($value),
+				self::stringify($format)
+			);
+
+			throw new InvalidValidationException(self::$errorName, $message, $key, $value);
 		}
 
-		$this->format = $format;
-		$this->targetClass = $targetClass;
-	}
-
-
-	/**
-	 * {@inheritDoc}
-	 */
-
-	public function execute(string $name, $value) : TypeResult
-	{
-		return (is_string($value) && $transformed = $this->targetClass::createFromFormat($this->format, $value)) ? 
-			TypeResult::success($name, $transformed) :
-			TypeResult::failure($name, $this->getName(), function($name){
-				return sprintf('\'%s\' is not a valid date/time of format %s', $name, $this->format);
-			});
-	}
-
-
-	/**
-	 * {@inheritDoc}
-	 */
-
-	public function getName() : string
-	{
-		return 'date_time';
+		return $dateTime;
 	}
 }

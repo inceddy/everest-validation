@@ -1,35 +1,24 @@
 <?php
-use Everest\Validation\Type;
 use Everest\Validation\Types\TypeEnum;
+use Everest\Validation\InvalidValidationException;
 
 class TypeEnumTest extends \PHPUnit\Framework\TestCase {
 
-	public function testConstructionFromBaseType()
+	public function testValidInput()
 	{
-		$this->assertInstanceOf(TypeEnum::CLASS, Type::Enum(['A']));
+		$value = (new TypeEnum)('in', ['in', 'out']);
+		$this->assertSame('in', $value);
 	}
 
-	public function testInitialState()
+	public function testValidIntputWithTransformation()
 	{
-		$type = new TypeEnum(['A']);
-		$this->assertEquals('enum', $type->getName());
+		$value = (new TypeEnum)('in', ['in' => true, 'out' => false]);
+		$this->assertSame(true, $value);
 	}
 
-	public function testExecution()
+	public function testInvalidInput()
 	{
-		$type = Type::Enum(['A' => false, 'B' => 10]);
-
-		// Success
-		$this->assertTrue(($result = $type->execute('name', 'B'))->isValid());
-		$this->assertEmpty($result->getErrorDescription());
-		$this->assertEquals(10, $result->getTransformed());
-		$this->assertFalse(($result = $type->execute('name', 'C'))->isValid());
-		$this->assertNotEmpty($result->getErrorDescription());
-	}
-
-	public function testInvalidConstruction()
-	{
-		$this->expectException(Exception::CLASS);
-		new TypeEnum([]);
+		$this->expectException(InvalidValidationException::CLASS);
+		$value = (new TypeEnum)('yes', ['in', 'out']);
 	}
 }

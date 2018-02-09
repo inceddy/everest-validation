@@ -13,17 +13,21 @@
 namespace Everest\Validation\Types;
 use Everest\Validation\InvalidValidationException;
 
-class TypeString extends Type {
+class TypeLengthBetween extends Type {
 
-	public static $errorName = 'invalid_string';
-	public static $errorMessage = '%s is not a valid string';
+	public static $errorName = 'invalid_length_between';
+	public static $errorMessage = 'The length of %s is not between %s and %s.';
 
-	public function __invoke($value, $message = null, string $key = null)
+	public function __invoke($value, $min, $max, $message = null, string $key = null)
 	{
-		if (!is_string($value)) {
+		$length = strlen($value);
+
+		if ($length < $min || $length > $max) {
 			$message = sprintf(
 				self::generateErrorMessage($message ?: self::$errorMessage),
-				self::stringify($value)
+				self::stringify($value),
+				self::stringify($min),
+				self::stringify($max)
 			);
 
 			throw new InvalidValidationException(self::$errorName, $message, $key, $value);
