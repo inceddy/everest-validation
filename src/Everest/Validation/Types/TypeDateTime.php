@@ -12,6 +12,7 @@
 
 namespace Everest\Validation\Types;
 use Everest\Validation\InvalidValidationException;
+use Everest\Validation\Validation;
 
 class TypeDateTime extends Type {
 
@@ -20,7 +21,10 @@ class TypeDateTime extends Type {
 
 	public function __invoke($value, $format, $message = null, string $key = null)
 	{
-		$dateTime = \DateTime::createFromFormat($format, $value);
+		$dateTime = \DateTime::createFromFormat(
+			Validation::String($format),
+			Validation::String($value)
+		);
 
 		if (!$dateTime || $value !== $dateTime->format($format)) {
 			$message = sprintf(
