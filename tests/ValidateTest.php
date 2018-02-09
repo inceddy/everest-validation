@@ -95,10 +95,58 @@ class ValidateTest extends \PHPUnit\Framework\TestCase {
 			->execute();
 	}
 
+	public function testGroupErrorsByKey()
+	{
+		$data = [
+			'key1' => 20,
+			'key2' => []
+		];
+
+		try {
+
+			Validate::lazy($data)
+				->that('key1')->all()->array()->string()
+				->that('key2')->all()->string()->integer()
+				->execute();
+		}
+		catch(InvalidLazyValidationException $error) {
+			$errors = $error->getErrorsGroupedByKey();
+			$this->assertArrayHasKey('key1', $errors);
+			$this->assertArrayHasKey('key2', $errors);
+
+			$this->assertSame(2, count($errors['key1']));
+			$this->assertSame(2, count($errors['key2']));
+		}
+	}
+
 	public function testUnknownType()
 	{
 		$this->expectException(\InvalidArgumentException::CLASS);
 		$this->expectExceptionMessage('Unknown type');
 		Validation::thisIsUnknown();
+	}
+
+	public function testInvalidOr()
+	{
+		$this->expectException(InvalidLazyValidationException::CLASS);
+		$this->expectExceptionMessage('The following');
+
+		Validate::lazy([
+			'key1' => []
+		])
+		->that('key1')->string()->or()->integer()
+		->execute();
+	}
+
+	public function testValidOr()
+	{
+		$data =
+		Validate::lazy([
+			'key1' => 20
+		])
+		->that('key1')->string()->or()->array()->or()->all()->integer()->min(1)->max(30)
+		->execute();
+
+		$this->assertSame(20, $data['key1']);
 	}
 }
