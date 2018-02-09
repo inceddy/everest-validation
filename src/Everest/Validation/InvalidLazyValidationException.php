@@ -35,4 +35,20 @@ class InvalidLazyValidationException extends InvalidValidationException
 	{
 		return $this->errors;
 	}
+
+	public function getErrorsGroupedByKey() : array
+	{
+		$errors = [];
+
+		foreach ($this->errors as $error) {
+			$key = $error->getKey();
+			if (!isset($errors[$key])) {
+				$errors[$key] = [];
+			}
+
+			$errors[$key][] = $error;
+		}
+
+		return $errors;
+	}
 }
