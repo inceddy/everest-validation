@@ -19,6 +19,8 @@ namespace Everest\Validation;
 
 final class Validate {
 
+	private $chainSets;
+
 	private $data;
 
 	private $lazy;
@@ -51,8 +53,13 @@ final class Validate {
 
 	public function that(string $key, $message = null)
 	{
+		if (!isset($this->chainSets[$key])) {
+			$this->chainSets[$key] = [];
+		}
+
 		$this->currentChain =
-		$this->chains[$key] = new ValidationChain($key, $message);
+		$this->chainSets[$key][] = new ValidationChain($key, $message);
+
 		return $this;
 	}
 
@@ -67,20 +74,69 @@ final class Validate {
 		return $this;
 	}
 
-	public function execute() : array
+	public function all()
+	{
+		$this->currentChain->all();
+		return $this;
+	}
+
+	public function or($message = null)
+	{
+		return $this->that(
+			$this->currentChain->getKey(),
+			$message ?: $this->currentChain->getMessage()
+		);
+	}
+
+	private function executeStrict() : array
+	{
+		$data = [];
+
+		foreach ($this->chainSets as $key => $chains) {
+			$errors = [];
+			foreach ($chains as $chain) {
+				$chainErrors = [];
+				foreach ($gen = $chain($this->data[$key] ?? null) as $error) {
+					$errors[] = $chainErrors[] = $error;
+				}
+
+				if (empty($chainErrors)) {
+					$data[$key] = $gen->getReturn();
+					continue 2;
+				}
+			}
+			if ($errors) {
+				throw $errors[0];
+			}
+		}
+
+		return $data;
+	}
+
+	private function executeLazy() : array
 	{
 		$data = 
 		$errors = [];
 
-		foreach ($this->chains as $key => $chain) {
-			foreach ($gen = $chain($this->data[$key] ?? null) as $error) {
-				if (!$this->lazy) {
-					throw $error;
+		foreach ($this->chainSets as $key => $chainSet) {
+			$chainSetErrors = [];
+			foreach ($chainSet as $chain) {
+				$chainErrors = [];
+				foreach ($gen = $chain($this->data[$key] ?? null) as $error) {
+					$chainErrors[] = 
+					$chainSetErrors[] = $error;
 				}
-				$errors[] = $error;
-			}
 
-			$data[$key] = $gen->getReturn();
+				if (empty($chainErrors)) {
+					unset($chainSetErrors);
+					$data[$key] = $gen->getReturn();
+					continue 2;
+				}
+			}
+			if ($chainSetErrors) {
+
+				$errors = array_merge($errors, $chainSetErrors);
+			}
 		}
 
 		if ($errors) {
@@ -88,6 +144,13 @@ final class Validate {
 		}
 
 		return $data;
+	}
+
+	public function execute()
+	{
+		return $this->lazy 
+			? $this->executeLazy() 
+			: $this->executeStrict();
 	}
 
 	public function __call($name, $args)
