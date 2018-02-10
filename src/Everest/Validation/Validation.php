@@ -36,6 +36,7 @@ final class Validation {
 		// Array related
 		'array'             => Types\TypeArray::CLASS,
 		'enum'              => Types\TypeEnum::CLASS,
+		'keyexists'         => Types\TypeKeyExists::CLASS,
 
 		// Boolean
 		'boolean'           => Types\TypeBoolean::CLASS,
