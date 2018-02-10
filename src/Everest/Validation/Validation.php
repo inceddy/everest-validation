@@ -11,7 +11,7 @@
 
 
 namespace Everest\Validation;
-use Everest\Validation\Type;
+use Everest\Validation\Types\Type;
 
 final class Validation {
 
