@@ -63,14 +63,9 @@ final class Validate {
 		return $this;
 	}
 
-	public function thatMay(string $key, $message = null)
+	public function optional($default = null)
 	{
-		return $this->that($key, $message)->may();
-	}
-
-	public function may()
-	{
-		$this->currentChain->allowNull();
+		$this->currentChain->optional($default);
 		return $this;
 	}
 

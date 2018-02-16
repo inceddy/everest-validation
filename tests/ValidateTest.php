@@ -22,7 +22,7 @@ class ValidateTest extends \PHPUnit\Framework\TestCase {
 
 		$transformed = Validate::lazy($data)
 			->that('date')->string()->dateTime('Y.m.d')
-			->that('unset')->may()->integer()->between(10, 20)
+			->that('unset')->optional()->integer()->between(10, 20)
 			->that('enum')->enum(['ja' => true, 'nein' => false])
 			->execute();
 
@@ -63,7 +63,7 @@ class ValidateTest extends \PHPUnit\Framework\TestCase {
 
 		$transformed = Validate::lazy($data)
 			->that('date')->string()->dateTime('Y.m.d')
-			->that('unset')->may()->integer()->between(10, 20)
+			->that('unset')->optional()->integer()->between(10, 20)
 			->that('enum')->enum(['ja' => true, 'nein' => false])
 			->that('any')
 			->execute();
@@ -148,5 +148,31 @@ class ValidateTest extends \PHPUnit\Framework\TestCase {
 		->execute();
 
 		$this->assertSame(20, $data['key1']);
+	}
+
+	public function testValidOptional()
+	{
+		$data = Validate::lazy([
+			'key1' => null,
+			'key2' => null
+		])
+		->that('key1')->optional()->string()
+		->that('key2')->optional(true)->boolean()
+		->execute();
+
+		$this->assertNull($data['key1']);
+		$this->assertTrue($data['key2']);
+	}
+
+	public function testInvalidOptional()
+	{
+		$this->expectException(InvalidLazyValidationException::CLASS);
+		$this->expectExceptionMessage('The following');
+
+		Validate::lazy([
+			'key' => null
+		])
+		->that('key')->optional(10)->string()
+		->execute();
 	}
 }

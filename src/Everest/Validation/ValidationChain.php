@@ -30,11 +30,20 @@ class ValidationChain {
 	private $valid = true;
 
 	/**
-	 * Indecates if null is a valid value
+	 * Indecates if the chain is optional or not
 	 * @var boolean
 	 */
 	
-	private $allowNull = false;
+	private $optional = false;
+
+	/**
+	 * Default value if the cain is optional
+	 * If the default value is callable, it is called
+	 * If the default value differs from null it is validated by the cain
+	 * @var null
+	 */
+	
+	private $default = null;
 
 	/**
 	 * Indecates if all validations should be
@@ -94,9 +103,14 @@ class ValidationChain {
 	 * true if value is `null`.
 	 */
 	
-	public function allowNull()
+	public function optional($default = null)
 	{
-		$this->allowNull = true;
+		if (is_callable($default)) {
+			$default = call_user_func($default);
+		}
+
+		$this->default = $default;
+		$this->optional = true;
 	}
 
 	public function valid() : bool
@@ -135,8 +149,12 @@ class ValidationChain {
 	
 	public function __invoke($value)
 	{
-		if (null === $value && $this->allowNull) {
-			return null;
+		if (null === $value && $this->optional) {
+			if (null === $this->default) {
+				return null;
+			}
+
+			$value = $this->default;
 		}
 
 		foreach ($this->validations as $validation) {
