@@ -25,6 +25,7 @@ final class Validation {
 
 		// Date
 		'datetime'          => Types\TypeDateTime::CLASS,
+		'datetimeimmutable' => Types\TypeDateTimeImmutable::CLASS,
 
 		// Numerical
 		'integer'           => Types\TypeInteger::CLASS,
