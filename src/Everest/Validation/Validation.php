@@ -23,6 +23,9 @@ final class Validation {
 		'lengthmax'         => Types\TypeLengthMax::CLASS,
 		'lengthmin'         => Types\TypeLengthMin::CLASS,
 
+		// Logic
+		'notempty'          => Types\TypeNotEmpty::CLASS,
+
 		// Date
 		'datetime'          => Types\TypeDateTime::CLASS,
 		'datetimeimmutable' => Types\TypeDateTimeImmutable::CLASS,
@@ -68,33 +71,65 @@ final class Validation {
 	 *
 	 * @param string $name
 	 *    The type name
-	 * @param string $typeClassName
+	 * @param mixed $type
 	 *    The type class
 	 * @param bool $overload
 	 *    Whether or not to overload existing types
 	 */
 	
-	public static function addType(string $name, string $typeClassName, bool $overload = false)
+	public static function addType(string $name, $type, bool $overload = false)
 	{
 		$name = strtolower($name);
-		
-		if (!$overload && isset(self::$typeMap[$name])) {
-			throw new \RuntimeException('Trying to overload type without setting overload flag.');
+
+		if (is_string($type)) {
+			if (!$overload && isset(self::$typeMap[$name])) {
+				throw new \RuntimeException(
+					'Trying to overload type-class without setting overload flag.'
+				);
+			}
+
+			if (!class_exists($type)) {
+				throw new \InvalidArgumentException(sprintf(
+					'Unkown type-class %s.', $type
+				));
+			}
+
+			if (!is_subclass_of($type, Type::CLASS)) {
+				throw new \InvalidArgumentException(sprintf(
+					'Type-class %s does extend from %s.', $type,	Type::CLASS
+				));
+			}
+
+			// Remove exisiting instance
+			unset(self::$instances[$type]);
+
+			self::$typeMap[$name] = $type;
+			return true;
 		}
 
-		if (!class_exists($typeClassName)) {
-			throw new \InvalidArgumentException(sprintf('Unkown class %s.', $typeClassName));
+		if (is_object($type)) {
+			$className = get_class($type);
+
+			if (!$overload && isset(self::$instances[$className])) {
+				throw new \RuntimeException(
+					'Trying to overload type-instance without setting overload flag.'
+				);
+			}
+
+			if (!$type instanceof Type) {
+				throw new \InvalidArgumentException(sprintf(
+					'Type-instance %s does extend from %s.', get_class($type),	Type::CLASS
+				));
+			}
+
+			self::$typeMap[$name] = $className; 
+			self::$instances[$className] = $type;
+			return true;
 		}
 
-		if (!is_subclass_of($typeClassName, Type::CLASS)) {
-			throw new \InvalidArgumentException(sprintf(
-				'%s does extend from %s.', 
-				$typeClassName,
-				Type::CLASS
-			));
-		}
-
-		self::$typeMap[$name] = $typeClassName;
+		throw new \InvalidArgumentException(
+			'Supplied is not a valid type-class nor a valid type-instance.'
+		);
 	}
 
 

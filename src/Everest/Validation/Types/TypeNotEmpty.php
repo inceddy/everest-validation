@@ -13,14 +13,14 @@
 namespace Everest\Validation\Types;
 use Everest\Validation\InvalidValidationException;
 
-class TypeArray extends Type {
+class TypeNotEmpty extends Type {
 
-	public static $errorName = 'invalid_array';
+	public static $errorName = 'value_missing';
 	public static $errorMessage = '%s is not a valid array';
 
 	public function __invoke($value, $message = null, string $key = null)
 	{
-		if (!is_array($value)) {
+		if (empty($value)) {
 
 			$message = sprintf(
 				static::generateErrorMessage($message ?: self::$errorMessage),
