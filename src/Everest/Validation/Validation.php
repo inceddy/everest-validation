@@ -49,6 +49,7 @@ final class Validation {
 		'trim'              => Filter\FilterTrim::CLASS,
 		'lowercase'         => Filter\FilterLowerCase::CLASS,
 		'uppercase'         => Filter\FilterUpperCase::CLASS,
+		'striptags'         => Filter\FilterStripTags::CLASS
 	];
 
 
