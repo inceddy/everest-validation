@@ -11,6 +11,8 @@
 
 namespace Everest\Validation\Types;
 
+use Everest\Validation\Undefined;
+
 abstract class Type {
 
 	public static function stringify($value) : string
@@ -25,6 +27,8 @@ abstract class Type {
 				return '<ARRAY>';
 			case is_bool($value):
 				return $value ? '<TRUE>' : '<FALSE>';
+			case is_object($value) && $value instanceof Undefined:
+				return '<UNDEFINED>';
 			case is_object($value):
 				return get_class($value);
 			case is_resource($value):
