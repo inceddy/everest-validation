@@ -9,7 +9,6 @@
  * file that was distributed with this source code.
  */
 
-
 namespace Everest\Validation;
 use Everest\Validation\Types\Type;
 
@@ -45,14 +44,14 @@ final class Validation {
 		// Boolean
 		'boolean'           => Types\TypeBoolean::CLASS,
 
+		// Other
+		'null'              => Types\TypeNull::CLASS,
+
 		// Filter
 		'trim'              => Filter\FilterTrim::CLASS,
 		'lowercase'         => Filter\FilterLowerCase::CLASS,
 		'uppercase'         => Filter\FilterUpperCase::CLASS,
-		'striptags'         => Filter\FilterStripTags::CLASS,
-
-		// Other
-		'null'              => Types\TypeNull::CLASS
+		'striptags'         => Filter\FilterStripTags::CLASS
 	];
 
 
@@ -132,19 +131,20 @@ final class Validation {
 		}
 
 		throw new \InvalidArgumentException(
-			'Supplied is not a valid type-class nor a valid type-instance.'
+			'Supplied argument is not a valid type-class nor a valid type-instance.'
 		);
 	}
 
 
 	/**
-	 * Returns a type instance.
-	 *
-	 * The type name might be prefix with 'optional' to
-	 * automaticly wrap the type in an ExpressionOptional-type.
+	 * Returns the result of the type execution.
 	 *
 	 * @throws InvalidArgumentException
-	 *    If the given type is unknown
+	 *   If the supplied type-name is unknown
+	 * @throws Everest\Validation\InvalidValidationException
+	 *   If the supplied argument is invalid for the type
+	 *   One can prefix type-name with `transform` to return
+	 *   `null` in invalid cases instead of throwing the exception.
 	 *
 	 * @param string $name
 	 *   The type name
