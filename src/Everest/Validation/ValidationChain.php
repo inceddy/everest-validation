@@ -43,7 +43,7 @@ class ValidationChain {
 	 * @var null
 	 */
 	
-	private $default = null;
+	private $default;
 
 	/**
 	 * Indecates if all validations should be
@@ -74,6 +74,7 @@ class ValidationChain {
 	
 	public function __construct(string $key, $message = null)
 	{
+		$this->default = Undefined::instance();
 		$this->key = $key;
 		$this->message = $message;
 	}
@@ -103,13 +104,18 @@ class ValidationChain {
 	 * true if value is `null`.
 	 */
 	
-	public function optional($default = null)
+	public function optional()
 	{
-		if (is_callable($default)) {
-			$default = call_user_func($default);
+		if (func_num_args()) {
+			$default = func_get_arg(0);
+
+			if (is_callable($default)) {
+				$default = call_user_func($default);
+			}
+
+			$this->default = $default;
 		}
 
-		$this->default = $default;
 		$this->optional = true;
 	}
 
@@ -149,9 +155,9 @@ class ValidationChain {
 	
 	public function __invoke($value)
 	{
-		if (null === $value && $this->optional) {
-			if (null === $this->default) {
-				return null;
+		if ($value === Undefined::instance() && $this->optional) {
+			if ($this->default === Undefined::instance()) {
+				return $this->default;
 			}
 
 			$value = $this->default;

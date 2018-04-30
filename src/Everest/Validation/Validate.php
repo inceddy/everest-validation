@@ -63,9 +63,9 @@ final class Validate {
 		return $this;
 	}
 
-	public function optional($default = null)
+	public function optional(...$args)
 	{
-		$this->currentChain->optional($default);
+		$this->currentChain->optional(...$args);
 		return $this;
 	}
 
@@ -91,12 +91,19 @@ final class Validate {
 			$errors = [];
 			foreach ($chains as $chain) {
 				$chainErrors = [];
-				foreach ($gen = $chain($this->data[$key] ?? null) as $error) {
+				foreach ($gen = $chain(
+					array_key_exists($key, $this->data) 
+						? $this->data[$key] 
+						: Undefined::instance()
+				) as $error) {
 					$errors[] = $chainErrors[] = $error;
 				}
 
 				if (empty($chainErrors)) {
-					$data[$key] = $gen->getReturn();
+					$return = $gen->getReturn();
+					if ($return !== Undefined::instance()) {
+						$data[$key] = $return;
+					}
 					continue 2;
 				}
 			}
@@ -117,14 +124,23 @@ final class Validate {
 			$chainSetErrors = [];
 			foreach ($chainSet as $chain) {
 				$chainErrors = [];
-				foreach ($gen = $chain($this->data[$key] ?? null) as $error) {
+
+				foreach ($gen = $chain(
+					array_key_exists($key, $this->data) 
+						? $this->data[$key] 
+						: Undefined::instance()
+				) as $error) {
+
 					$chainErrors[] = 
 					$chainSetErrors[] = $error;
 				}
 
 				if (empty($chainErrors)) {
 					unset($chainSetErrors);
-					$data[$key] = $gen->getReturn();
+					$return = $gen->getReturn();
+					if ($return !== Undefined::instance()) {
+						$data[$key] = $return;
+					}
 					continue 2;
 				}
 			}

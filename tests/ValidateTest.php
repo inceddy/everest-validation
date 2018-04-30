@@ -16,7 +16,6 @@ class ValidateTest extends \PHPUnit\Framework\TestCase {
 	{
 		$data = [
 			'date'  => '2018.02.08',
-			'unset' => null,
 			'enum'  => 'ja'
 		];
 
@@ -28,7 +27,7 @@ class ValidateTest extends \PHPUnit\Framework\TestCase {
 
 
 		$this->assertInstanceOf(\DateTime::CLASS, $transformed['date']);
-		$this->assertNull($transformed['unset']);
+		$this->assertFalse(isset($transformed['unset']));
 		$this->assertTrue($transformed['enum']);
 	}
 
@@ -40,7 +39,6 @@ class ValidateTest extends \PHPUnit\Framework\TestCase {
 
 		$data = [
 			'date'  => '2018.02.08',
-			'unset' => null,
 			'enum'  => 'yes'
 		];
 
@@ -55,7 +53,6 @@ class ValidateTest extends \PHPUnit\Framework\TestCase {
 	{
 		$data = [
 			'date'  => '2018.02.08',
-			'unset' => null,
 			'enum'  => 'ja',
 			'any'   => true,
 			'none'  => ''
@@ -70,7 +67,7 @@ class ValidateTest extends \PHPUnit\Framework\TestCase {
 
 
 		$this->assertInstanceOf(\DateTime::CLASS, $transformed['date']);
-		$this->assertNull($transformed['unset']);
+		$this->assertFalse(isset($transformed['unset']));
 		$this->assertTrue($transformed['enum']);
 		$this->assertTrue($transformed['any']);
 		$this->assertFalse(isset($transformed['none']));
@@ -152,15 +149,12 @@ class ValidateTest extends \PHPUnit\Framework\TestCase {
 
 	public function testValidOptional()
 	{
-		$data = Validate::lazy([
-			'key1' => null,
-			'key2' => null
-		])
+		$data = Validate::lazy([])
 		->that('key1')->optional()->string()
 		->that('key2')->optional(true)->boolean()
 		->execute();
 
-		$this->assertNull($data['key1']);
+		$this->assertFalse(isset($data['key1']));
 		$this->assertTrue($data['key2']);
 	}
 
