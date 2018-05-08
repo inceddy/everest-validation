@@ -156,11 +156,7 @@ class ValidationChain {
 	public function __invoke($value)
 	{
 		if ($value === Undefined::instance() && $this->optional) {
-			if ($this->default === Undefined::instance()) {
-				return $this->default;
-			}
-
-			$value = $this->default;
+			return $this->default;
 		}
 
 		foreach ($this->validations as $validation) {
