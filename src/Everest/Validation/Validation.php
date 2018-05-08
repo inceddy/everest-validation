@@ -12,7 +12,7 @@
 namespace Everest\Validation;
 use Everest\Validation\Types\Type;
 
-final class Validation {
+final class Validation implements \ArrayAccess {
 
 	private static $typeMap = [
 		// String related
@@ -162,7 +162,6 @@ final class Validation {
 			$name = substr($name, 9);
 		}
 
-
 		if (!isset(self::$typeMap[$name])) {
 			throw new \InvalidArgumentException(
 				sprintf('Unknown type \'%s\' please use one of [%s].', 
@@ -188,5 +187,25 @@ final class Validation {
 		catch (InvalidValidationException $e) {
 			return null;
 		}
+	}
+
+	public function offsetExists($offset)
+	{
+		return isset(self::$typeMap[$offset]);
+	}
+
+	public function offsetGet ($offset)
+	{
+		return self::$typeMap[$offset];
+	}
+
+	public function offsetSet($offset, $value) 
+	{
+		throw new \Exception('Not implemented');
+	}
+
+	public function offsetUnset($offset)
+	{
+		throw new \Exception('Not implemented');
 	}
 }
