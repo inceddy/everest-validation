@@ -15,8 +15,8 @@ use Everest\Validation\InvalidValidationException;
 
 class TypeNotEmpty extends Type {
 
-	public static $errorName = 'value_missing';
-	public static $errorMessage = '%s is not a valid array';
+	public static $errorName = 'is_empty';
+	public static $errorMessage = 'May not be empty';
 
 	public function __invoke($value, $message = null, string $key = null)
 	{
