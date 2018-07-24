@@ -83,78 +83,103 @@ final class Validate {
 		);
 	}
 
-	private function executeStrict() : array
+	private function executeValidationChain(ValidationChain $chain, $value, $key = null)
 	{
-		$data = [];
+		if ($chain->all) {
+			Validation::array($value);
 
-		foreach ($this->chainSets as $key => $chains) {
-			$errors = [];
-			foreach ($chains as $chain) {
-				$chainErrors = [];
-				foreach ($gen = $chain(
-					array_key_exists($key, $this->data) 
-						? $this->data[$key] 
-						: Undefined::instance()
-				) as $error) {
-					$errors[] = $chainErrors[] = $error;
+			$errors = 
+			$result = [];
+
+			foreach ($value as $index => $item) {
+				$error = null;
+				foreach ($gen = $chain->setKey($key . '[' . $index . ']')($item, $index) as $error) {
+					$errors[] = $error;
 				}
 
-				if (empty($chainErrors)) {
-					$return = $gen->getReturn();
-					if ($return !== Undefined::instance()) {
-						$data[$key] = $return;
-					}
-					continue 2;
+				if (!$error) {
+					$result[$index] = $gen->getReturn();
 				}
 			}
-			if ($errors) {
-				throw $errors[0];
+
+			return [$result, $errors];
+		}
+
+		$errors = [];
+
+		foreach ($gen = $chain($value) as $error) {
+			$errors[] = $error;
+		}
+
+		return [$gen->getReturn(), $errors];		
+	}
+
+	private function executeStrict() : array
+	{
+		$result = [];
+
+		foreach ($this->chainSets as $key => $chains) {
+			$chainSetErrors = [];
+
+			$value = array_key_exists($key, $this->data) 
+				? $this->data[$key] 
+				: Undefined::instance();
+
+			foreach ($chains as $chain) {
+				[$chainResult, $chainErrors] = $this->executeValidationChain($chain, $value, $key);
+				if (empty($chainErrors)) {
+					if ($chainResult !== Undefined::instance()) {
+						$result[$key] = $chainResult;
+					}
+					break;
+				}
+
+				$chainSetErrors = array_merge($chainSetErrors, $chainErrors);
+			}
+
+			if (!array_key_exists($key, $result)) {
+				throw $chainSetErrors[0];
 			}
 		}
 
-		return $data;
+		return $result;
 	}
 
 	private function executeLazy() : array
 	{
-		$data = 
-		$errors = [];
+		$errors =
+		$result = [];
 
-		foreach ($this->chainSets as $key => $chainSet) {
+		foreach ($this->chainSets as $key => $chains) {
 			$chainSetErrors = [];
-			foreach ($chainSet as $chain) {
-				$chainErrors = [];
 
-				foreach ($gen = $chain(
-					array_key_exists($key, $this->data) 
-						? $this->data[$key] 
-						: Undefined::instance()
-				) as $error) {
+			$value = array_key_exists($key, $this->data) 
+				? $this->data[$key] 
+				: Undefined::instance();
 
-					$chainErrors[] = 
-					$chainSetErrors[] = $error;
-				}
-
+			foreach ($chains as $chain) {
+				[$chainResult, $chainErrors] = $this->executeValidationChain($chain, $value, $key);
 				if (empty($chainErrors)) {
-					unset($chainSetErrors);
-					$return = $gen->getReturn();
-					if ($return !== Undefined::instance()) {
-						$data[$key] = $return;
+					$chainSetErrors = [];
+					if ($chainResult !== Undefined::instance()) {
+						$result[$key] = $chainResult;
 					}
-					continue 2;
+					break;
 				}
-			}
-			if ($chainSetErrors) {
 
+				$chainSetErrors = array_merge($chainSetErrors, $chainErrors);
+			}
+
+			if (!array_key_exists($key, $result)) {
 				$errors = array_merge($errors, $chainSetErrors);
 			}
 		}
 
-		if ($errors) {
+		if (!empty($errors)) {
 			throw InvalidLazyValidationException::fromErrors($errors);
 		}
 
-		return $data;
+		return $result;
 	}
 
 	public function execute()

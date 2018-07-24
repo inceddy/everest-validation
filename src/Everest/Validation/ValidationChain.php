@@ -51,7 +51,7 @@ class ValidationChain {
 	 * @var boolean
 	 */
 	
-	private $all = false;
+	public $all = false;
 
 	/**
 	 * The key of the value
@@ -82,6 +82,12 @@ class ValidationChain {
 	public function getKey()
 	{
 		return $this->key;
+	}
+
+	public function setKey(string $key)
+	{
+		$this->key = $key;
+		return $this;
 	}
 
 	public function getMessage()
@@ -153,10 +159,15 @@ class ValidationChain {
 	 *   The final value
 	 */
 	
-	public function __invoke($value)
+	public function __invoke($value, $index = null)
 	{
-		if ($value === Undefined::instance() && $this->optional) {
-			return $this->default;
+		if ($value === Undefined::instance()) {
+			if ($this->optional) {
+				return $this->default;
+			}
+
+			yield new InvalidValidationException('missing', 'Required property is missing', $this->key, $value);
+			return $value;
 		}
 
 		foreach ($this->validations as $validation) {
@@ -166,9 +177,6 @@ class ValidationChain {
 			catch (InvalidValidationException $e) {
 				$this->valid = false;
 				yield $e;
-				if (!$this->all) {
-					break;
-				}
 			}
 		}
 

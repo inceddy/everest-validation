@@ -25,7 +25,6 @@ class ValidateTest extends \PHPUnit\Framework\TestCase {
 			->that('enum')->enum(['ja' => true, 'nein' => false])
 			->execute();
 
-
 		$this->assertInstanceOf(\DateTime::CLASS, $transformed['date']);
 		$this->assertFalse(isset($transformed['unset']));
 		$this->assertTrue($transformed['enum']);
@@ -102,8 +101,8 @@ class ValidateTest extends \PHPUnit\Framework\TestCase {
 		try {
 
 			Validate::lazy($data)
-				->that('key1')->all()->array()->string()
-				->that('key2')->all()->string()->integer()
+				->that('key1')->array()->string()
+				->that('key2')->string()->integer()
 				->execute();
 		}
 		catch(InvalidLazyValidationException $error) {
@@ -141,7 +140,7 @@ class ValidateTest extends \PHPUnit\Framework\TestCase {
 		Validate::lazy([
 			'key1' => 20
 		])
-		->that('key1')->string()->or()->array()->or()->all()->integer()->min(1)->max(30)
+		->that('key1')->string()->or()->array()->or()->integer()->min(1)->max(30)
 		->execute();
 
 		$this->assertSame(20, $data['key1']);
@@ -168,5 +167,50 @@ class ValidateTest extends \PHPUnit\Framework\TestCase {
 		])
 		->that('key')->optional(10)->string()
 		->execute();
+	}
+
+	public function testValidAll()
+	{
+		['key' => $result] = Validate::lazy([
+			'key' => [10, 20, 40]
+		])
+		->that('key')->all()->integer()
+		->execute();
+
+		$this->assertSame([10, 20, 40], $result);
+	}
+
+	public function testInvalidAll()
+	{
+		$this->expectException(InvalidLazyValidationException::CLASS);
+		$this->expectExceptionMessage('The following 2');
+
+		Validate::lazy([
+			'array' => ['str', 20, 'ing']
+		])
+		->that('array')->all()->integer()
+		->execute();
+	}
+
+	public function testFullExecutionOfChain()
+	{
+		$this->expectException(InvalidLazyValidationException::CLASS);
+		$this->expectExceptionMessage('The following 2');
+
+		Validate::lazy([
+			'array' => []
+		])
+		->that('array')->keyExists('a')->keyExists('b')
+		->execute();
+	}
+
+	public function testErrorOnRequiredProperty()
+	{
+		$this->expectException(InvalidLazyValidationException::CLASS);
+		$this->expectExceptionMessage('The following 1');
+
+		Validate::lazy([])
+			->that('missing')->string()
+			->execute();
 	}
 }
