@@ -11,6 +11,7 @@
 
 namespace Everest\Validation;
 
+
 /**
  * Validates alements in array
  * @author Philipp Steingrebe <philipp@steingrebe.de>
@@ -37,6 +38,12 @@ final class Validate {
 
 	private function __construct($data, bool $lazy)
 	{
+		$this->setData($data);
+		$this->setLazy($lazy);
+	}
+
+	public function setData($data)
+	{
 		if (is_object($data) && method_exists($data, 'toArray')) {
 			$data = $data->toArray();
 		}
@@ -48,7 +55,13 @@ final class Validate {
 		}
 
 		$this->data = $data;
+		return $this;
+	}
+
+	public function setLazy(bool $lazy)
+	{
 		$this->lazy = $lazy;
+		return $this;
 	}
 
 	public function that(string $key, $message = null)
@@ -85,33 +98,33 @@ final class Validate {
 
 	private function executeValidationChain(ValidationChain $chain, $value, $key = null)
 	{
-		if ($chain->all) {
-			Validation::array($value);
-
-			$errors = 
-			$result = [];
-
-			foreach ($value as $index => $item) {
-				$error = null;
-				foreach ($gen = $chain->setKey($key . '[' . $index . ']')($item, $index) as $error) {
-					$errors[] = $error;
-				}
-
-				if (!$error) {
-					$result[$index] = $gen->getReturn();
-				}
+		// Single value
+		if (!$chain->all) {
+			try {
+				return [$chain($value, $key), []];
 			}
-
-			return [$result, $errors];
+			catch (InvalidValidationException $error) {
+				return [Undefined::instance(), [$error]];
+			}
 		}
 
-		$errors = [];
+		// Array value
+		Validation::array($value);
 
-		foreach ($gen = $chain($value) as $error) {
-			$errors[] = $error;
+		$errors = 
+		$result = [];
+
+		foreach ($value as $index => $item) {
+			try {
+				$result[$index] = $chain->setKey($key . '[' . $index . ']')($item, $index);
+			}
+			catch (InvalidValidationException $error) {
+				$result[$index] = Undefined::instance();
+				$errors[] = $error;
+			}
 		}
 
-		return [$gen->getReturn(), $errors];		
+		return [$result, $errors];
 	}
 
 	private function executeStrict() : array
@@ -182,8 +195,12 @@ final class Validate {
 		return $result;
 	}
 
-	public function execute()
+	public function execute($data = null)
 	{
+		if (null !== $data) {
+			$this->setData($data);
+		}
+
 		return $this->lazy 
 			? $this->executeLazy() 
 			: $this->executeStrict();
@@ -192,7 +209,7 @@ final class Validate {
 	public function __call($name, $args)
 	{
 		if (!$this->currentChain) {
-			throw new \LogicException('No validation target specified yet.');
+			throw new \LogicException('No validation target specified yet');
 		}
 
 		$this->currentChain->add(function($value, string $key, $message = null) use ($args, $name) {

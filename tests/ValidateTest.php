@@ -101,8 +101,8 @@ class ValidateTest extends \PHPUnit\Framework\TestCase {
 		try {
 
 			Validate::lazy($data)
-				->that('key1')->array()->string()
-				->that('key2')->string()->integer()
+				->that('key1')->array()
+				->that('key2')->string()
 				->execute();
 		}
 		catch(InvalidLazyValidationException $error) {
@@ -110,8 +110,8 @@ class ValidateTest extends \PHPUnit\Framework\TestCase {
 			$this->assertArrayHasKey('key1', $errors);
 			$this->assertArrayHasKey('key2', $errors);
 
-			$this->assertSame(2, count($errors['key1']));
-			$this->assertSame(2, count($errors['key2']));
+			$this->assertSame(1, count($errors['key1']));
+			$this->assertSame(1, count($errors['key2']));
 		}
 	}
 
@@ -189,18 +189,6 @@ class ValidateTest extends \PHPUnit\Framework\TestCase {
 			'array' => ['str', 20, 'ing']
 		])
 		->that('array')->all()->integer()
-		->execute();
-	}
-
-	public function testFullExecutionOfChain()
-	{
-		$this->expectException(InvalidLazyValidationException::CLASS);
-		$this->expectExceptionMessage('The following 2');
-
-		Validate::lazy([
-			'array' => []
-		])
-		->that('array')->keyExists('a')->keyExists('b')
 		->execute();
 	}
 

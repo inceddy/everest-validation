@@ -96,8 +96,9 @@ class ValidationChain {
 	}
 
 	/**
-	 * Run all validations even
-	 * if one already failed.
+	 * Input value is an array and
+	 * this chain is executed on every element
+	 * in the array.
 	 */
 	
 	public function all()
@@ -125,10 +126,6 @@ class ValidationChain {
 		$this->optional = true;
 	}
 
-	public function valid() : bool
-	{
-		return $this->valid;
-	}
 
 	/**
 	 * Adds a new validation clusore the the 
@@ -166,18 +163,12 @@ class ValidationChain {
 				return $this->default;
 			}
 
-			yield new InvalidValidationException('missing', 'Required property is missing', $this->key, $value);
+			throw new InvalidValidationException('missing', 'Required property is missing', $this->key, $value);
 			return $value;
 		}
 
 		foreach ($this->validations as $validation) {
-			try {
-				$value = $validation($value, $this->key, $this->message);
-			}
-			catch (InvalidValidationException $e) {
-				$this->valid = false;
-				yield $e;
-			}
+			$value = $validation($value, $this->key, $this->message);
 		}
 
 		return $value;
