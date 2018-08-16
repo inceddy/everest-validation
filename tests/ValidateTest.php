@@ -201,4 +201,13 @@ class ValidateTest extends \PHPUnit\Framework\TestCase {
 			->that('missing')->string()
 			->execute();
 	}
+
+	public function testDirectReturnIfValueMatchesDefault()
+	{
+		['def' => $value] = Validate::lazy(['def' => null])
+			->that('def')->optional(null)->string()
+			->execute();
+
+		$this->assertSame(null, $value);
+	}
 }

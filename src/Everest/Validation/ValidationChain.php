@@ -164,6 +164,11 @@ class ValidationChain {
 			}
 
 			throw new InvalidValidationException('missing', 'Required property is missing', $this->key, $value);
+		}
+
+		// If value is equal to default return it
+		// This avoids chains like: `->that('foo')->optional(null)->string()->or()->null()		
+		if ($this->optional && $this->default === $value) {
 			return $value;
 		}
 
