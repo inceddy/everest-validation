@@ -11,19 +11,34 @@
 
 namespace Everest\Validation;
 
-
 /**
- * Validates alements in array
+ * Validates values in an array or arraylike object
  * @author Philipp Steingrebe <philipp@steingrebe.de>
- * @package Everest\Http
+ * @package Everest\Validation
  */
 
 final class Validate {
 
+	/**
+	 * Sets of validation chains to be executed on
+	 * values in the data.
+	 * @var array
+	 */
+	
 	private $chainSets;
 
+	/**
+	 * The data to be validated
+	 * @var array
+	 */
+	
 	private $data;
 
+	/**
+	 * Flag if the validation is lazy or not
+	 * @var boolean
+	 */
+	
 	private $lazy;
 
 	public static function lazy($data)
@@ -34,6 +49,71 @@ final class Validate {
 	public static function strict($data)
 	{
 		return new static($data, false);
+	}
+
+	private static function flatten(array $nextKeys, $data, array $prevKeys = [])
+	{
+		$currentKeys = [array_shift($nextKeys)];
+
+		if (!$currentKeys[0] || $data instanceof Undefined) {
+			return [implode('.', $prevKeys) => $data];
+		}
+
+		if (!is_array($data)) {
+			return [implode('.', array_merge($currentKeys, $prevKeys)) => Undefined::instance()];
+		}
+
+		if ($currentKeys[0] === '*' || $currentKeys[0] === '') {
+			$currentKeys = array_keys($data);
+		}
+
+		$results = [];
+
+		foreach ($currentKeys as $key) {
+			$results = array_merge($results, self::flatten(
+				$nextKeys, 
+				array_key_exists($key, $data) ? $data[$key] : Undefined::instance(),
+				array_merge($prevKeys, [$key])
+			));
+		}
+
+		return $results;
+	}
+
+	/**
+	 * Taken from Laravel
+	 *
+	 * @param  array &$array
+	 * @param  string|null $key
+	 * @param  mixed $value
+	 *
+	 * @return array|mixed
+	 */
+	
+	private static function expand(&$array, $key, $value)
+	{
+		if (is_null($key)) {
+			return $array = $value;
+		}
+
+		$keys = explode('.', $key);
+
+		while (count($keys) > 1) {
+			$key = array_shift($keys);
+
+			// If the key doesn't exist at this depth, we will just create an empty array
+			// to hold the next value, allowing us to create the arrays to hold final
+			// values at the correct depth. Then we'll keep digging into the array.
+			if (!isset($array[$key]) || !is_array($array[$key])) {
+				$array[$key] = [];
+			}
+
+			$array = &$array[$key];
+		}
+
+		$array[array_shift($keys)] = $value;
+
+		return $array;
 	}
 
 	private function __construct($data, bool $lazy)
@@ -96,27 +176,27 @@ final class Validate {
 		);
 	}
 
-	private function executeValidationChain(ValidationChain $chain, $value, $key = null)
+	private function executeValidationChain(ValidationChain $chain, $value, string $primaryKey, array $nextKeys)
 	{
-		// Single value
-		if (!$chain->all) {
+		if ($chain->all) {
+			$nextKeys[] = '*';
+		}
+
+		if (empty($nextKeys)) {
 			try {
-				return [$chain($value, $key), []];
+				return [$chain($value, $primaryKey), []];
 			}
 			catch (InvalidValidationException $error) {
 				return [Undefined::instance(), [$error]];
 			}
 		}
 
-		// Array value
-		Validation::array($value);
-
 		$errors = 
 		$result = [];
 
-		foreach ($value as $index => $item) {
+		foreach (self::flatten($nextKeys, $value) as $index => $item) {
 			try {
-				$result[$index] = $chain->setKey($key . '[' . $index . ']')($item, $index);
+				$result[$index] = $chain->setKey($primaryKey . '.' . $index)($item, $index);
 			}
 			catch (InvalidValidationException $error) {
 				$result[$index] = Undefined::instance();
@@ -124,7 +204,13 @@ final class Validate {
 			}
 		}
 
-		return [$result, $errors];
+		$flatResult = [];
+
+		foreach ($result as $key => $value) {
+			self::expand($flatResult, $key, $value);
+		}
+
+		return [$flatResult, $errors];
 	}
 
 	private function executeStrict() : array
@@ -134,15 +220,18 @@ final class Validate {
 		foreach ($this->chainSets as $key => $chains) {
 			$chainSetErrors = [];
 
-			$value = array_key_exists($key, $this->data) 
+			$nextKeys = explode('.', $key);
+			$primaryKey = array_shift($nextKeys);
+
+			$value = array_key_exists($primaryKey, $this->data) 
 				? $this->data[$key] 
 				: Undefined::instance();
 
 			foreach ($chains as $chain) {
-				[$chainResult, $chainErrors] = $this->executeValidationChain($chain, $value, $key);
+				[$chainResult, $chainErrors] = $this->executeValidationChain($chain, $value, $primaryKey, $nextKeys);
 				if (empty($chainErrors)) {
 					if ($chainResult !== Undefined::instance()) {
-						$result[$key] = $chainResult;
+						$result[$primaryKey] = $chainResult;
 					}
 					break;
 				}
@@ -165,17 +254,20 @@ final class Validate {
 
 		foreach ($this->chainSets as $key => $chains) {
 			$chainSetErrors = [];
+			$nextKeys = explode('.', $key);
+			$primaryKey = array_shift($nextKeys);
 
-			$value = array_key_exists($key, $this->data) 
-				? $this->data[$key] 
+			$value = array_key_exists($primaryKey, $this->data) 
+				? $this->data[$primaryKey] 
 				: Undefined::instance();
 
+
 			foreach ($chains as $chain) {
-				[$chainResult, $chainErrors] = $this->executeValidationChain($chain, $value, $key);
+				[$chainResult, $chainErrors] = $this->executeValidationChain($chain, $value, $primaryKey, $nextKeys);
 				if (empty($chainErrors)) {
 					$chainSetErrors = [];
 					if ($chainResult !== Undefined::instance()) {
-						$result[$key] = $chainResult;
+						$result[$primaryKey] = $chainResult;
 					}
 					break;
 				}

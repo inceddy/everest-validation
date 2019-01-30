@@ -210,4 +210,59 @@ class ValidateTest extends \PHPUnit\Framework\TestCase {
 
 		$this->assertSame(null, $value);
 	}
+
+	public function testValidKeyPatternLazyValidation()
+	{
+		$data = [
+			'foo' => [
+				['foo' => 1],
+				['foo' => 2]
+			],
+			'bar' => [
+				['bar' => false], 
+				['bar' => true]
+			]
+		];
+
+		$result = Validate::lazy($data)
+			->that('foo.*.foo')->integer()
+			->that('bar.*.bar')->boolean()
+			->execute();
+
+		$this->assertSame($data, $result);
+	}
+
+	public function testInvalidKeyPatternLazyValidation()
+	{
+		$this->expectException(InvalidLazyValidationException::CLASS);
+		$this->expectExceptionMessage('The following 4');
+
+		$data = [
+			'foo' => [
+				['foo' => 100],
+				['foo' => 200]
+			],
+			'bar' => [
+				['bar' => false], 
+				['bar' => true]
+			]
+		];
+
+		$result = Validate::lazy($data)
+			->that('foo.*.foo')->boolean()
+			->that('bar.*.bar')->integer()
+			->execute();
+	}
+
+	public function testInvalidKeyPatternOnNoneArrayValue()
+	{
+		$this->expectException(InvalidLazyValidationException::CLASS);
+		$this->expectExceptionMessage('The following 1');
+
+		$result = Validate::lazy(['foo' => 10])
+			->that('foo.bar')->integer()
+			->execute();
+
+		var_dump($result);
+	}
 }
