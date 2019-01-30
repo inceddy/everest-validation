@@ -18,6 +18,8 @@ abstract class Type {
 	public static function stringify($value) : string
 	{
 		switch (true) {
+			case is_bool($value):
+				return $value ? '<TRUE>' : '<FALSE>';
 			case is_scalar($value):
 				$value = (string) $value;
 				return mb_strlen($value) < 100 ?
@@ -25,8 +27,6 @@ abstract class Type {
 					substr($value, 0, 97) . '...';
 			case is_array($value):
 				return '<ARRAY>';
-			case is_bool($value):
-				return $value ? '<TRUE>' : '<FALSE>';
 			case is_object($value) && $value instanceof Undefined:
 				return '<UNDEFINED>';
 			case is_object($value):
