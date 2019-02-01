@@ -229,9 +229,19 @@ final class Validate {
 
 			foreach ($chains as $chain) {
 				[$chainResult, $chainErrors] = $this->executeValidationChain($chain, $value, $primaryKey, $nextKeys);
+
 				if (empty($chainErrors)) {
+					$chainSetErrors = [];
 					if ($chainResult !== Undefined::instance()) {
-						$result[$primaryKey] = $chainResult;
+						if (is_array($chainResult)) {
+							$result[$primaryKey] = array_replace_recursive(
+								$result[$primaryKey] ?? [],
+								$chainResult
+							);
+						}
+						else {
+							$result[$primaryKey] = $chainResult;
+						}
 					}
 					break;
 				}
@@ -239,7 +249,8 @@ final class Validate {
 				$chainSetErrors = array_merge($chainSetErrors, $chainErrors);
 			}
 
-			if (!array_key_exists($key, $result)) {
+			// Stop on first error
+			if (!empty($chainSetErrors)) {
 				throw $chainSetErrors[0];
 			}
 		}
@@ -264,10 +275,19 @@ final class Validate {
 
 			foreach ($chains as $chain) {
 				[$chainResult, $chainErrors] = $this->executeValidationChain($chain, $value, $primaryKey, $nextKeys);
+
 				if (empty($chainErrors)) {
 					$chainSetErrors = [];
 					if ($chainResult !== Undefined::instance()) {
-						$result[$primaryKey] = $chainResult;
+						if (is_array($chainResult)) {
+							$result[$primaryKey] = array_replace_recursive(
+								$result[$primaryKey] ?? [],
+								$chainResult
+							);
+						}
+						else {
+							$result[$primaryKey] = $chainResult;
+						}
 					}
 					break;
 				}
@@ -275,7 +295,8 @@ final class Validate {
 				$chainSetErrors = array_merge($chainSetErrors, $chainErrors);
 			}
 
-			if (!array_key_exists($key, $result)) {
+			// Collect errors
+			if (!empty($chainSetErrors)) {
 				$errors = array_merge($errors, $chainSetErrors);
 			}
 		}

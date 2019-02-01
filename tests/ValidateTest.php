@@ -215,18 +215,20 @@ class ValidateTest extends \PHPUnit\Framework\TestCase {
 	{
 		$data = [
 			'foo' => [
-				['foo' => 1],
-				['foo' => 2]
+				['foo' => 1, 'fom' => 2],
+				['foo' => 2, 'fom' => 3] 
 			],
 			'bar' => [
-				['bar' => false], 
-				['bar' => true]
+				['bar' => false, 'baz' => false], 
+				['bar' => true, 'baz' => true]
 			]
 		];
 
 		$result = Validate::lazy($data)
 			->that('foo.*.foo')->integer()
+			->that('foo.*.fom')->integer()
 			->that('bar.*.bar')->boolean()
+			->that('bar.*.baz')->boolean()
 			->execute();
 
 		$this->assertSame($data, $result);
@@ -262,7 +264,24 @@ class ValidateTest extends \PHPUnit\Framework\TestCase {
 		$result = Validate::lazy(['foo' => 10])
 			->that('foo.bar')->integer()
 			->execute();
+	}
 
-		var_dump($result);
+	public function testMissingKeyPattern()
+	{
+		$this->expectException(InvalidLazyValidationException::CLASS);
+		$this->expectExceptionMessage('The following 2');
+
+		$data = [
+			'foo' => [
+				['key' => 10],
+				['key' => 10]
+			]
+		];
+
+		$result = Validate::lazy($data)
+			->that('foo.*.foo')->optional()->boolean()
+			->that('foo.*.key')->integer()
+			->that('foo.*.bar')->string()
+			->execute();
 	}
 }
