@@ -46,6 +46,7 @@ final class Validation implements \ArrayAccess {
 
 		// Other
 		'null'              => Types\TypeNull::CLASS,
+		'closure'           => Types\TypeClosure::CLASS,
 
 		// Filter
 		'trim'              => Filter\FilterTrim::CLASS,
