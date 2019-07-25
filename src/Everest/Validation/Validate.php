@@ -327,7 +327,16 @@ final class Validate {
 
 		$this->currentChain->add(function($value, string $key, $message = null) use ($args, $name) {
 			array_unshift($args, $value);
-			array_push($args, $message, $key);
+
+			$argCount = count($args);
+			$typeArgCount = Validation::getTypeParameterCount($name);
+
+			if ($argCount == $typeArgCount - 2) {
+				array_push($args, $message, $key);
+			}
+			else if ($argCount == $typeArgCount - 1) {
+				array_push($args, $key);
+			}
 
 			return Validation::$name(...$args);
 		});

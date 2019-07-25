@@ -21,6 +21,7 @@ final class Validation implements \ArrayAccess {
 		'lengthbetween'     => Types\TypeLengthBetween::CLASS,
 		'lengthmax'         => Types\TypeLengthMax::CLASS,
 		'lengthmin'         => Types\TypeLengthMin::CLASS,
+		'pattern'           => Types\TypePattern::class,
 
 		// Logic
 		'notempty'          => Types\TypeNotEmpty::CLASS,
@@ -136,6 +137,27 @@ final class Validation implements \ArrayAccess {
 		);
 	}
 
+	public static function getTypeInstance(string $name)
+	{
+		$className = self::$typeMap[$name];
+		return self::$instances[$className] ?? self::$instances[$className] = new $className();
+	}
+
+	public static function getTypeParameterCount(string $name)
+	{
+		static $counts = [];
+
+		$name = strtolower($name);
+
+		if (isset($counts[$name])) {
+			return $counts[$name];
+		}
+
+		$type = self::getTypeInstance($name);
+
+		return $counts[$name] = (new \ReflectionMethod($type, '__invoke'))->getNumberOfParameters();
+	}
+
 
 	/**
 	 * Returns the result of the type execution.
@@ -173,10 +195,7 @@ final class Validation implements \ArrayAccess {
 		}
 
 
-		$className = self::$typeMap[$name];
-
-		$type = self::$instances[$className] ?? 
-						self::$instances[$className] = new $className();
+		$type = self::getTypeInstance($name);
 
 		if (!$trans) {
 			return $type(... $args);
