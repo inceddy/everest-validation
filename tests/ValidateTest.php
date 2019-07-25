@@ -284,4 +284,36 @@ class ValidateTest extends \PHPUnit\Framework\TestCase {
 			->that('foo.*.bar')->string()
 			->execute();
 	}
+
+	public function testMessageAndKeyPropagationOnType()
+	{
+		$this->expectException(InvalidLazyValidationException::CLASS);
+		$this->expectExceptionMessage('this_is_not_a_boolean');
+		
+		try {
+			Validate::lazy(['key' => 'dfdf'])
+				->that('key')->boolean('this_is_not_a_boolean')
+				->execute();
+		}
+		catch(InvalidLazyValidationException $error) {
+			$this->assertSame('key', $error->getErrors()[0]->getKey());
+			throw $error;
+		}
+	}
+
+	public function testMessageAndKeyPropagationOnKey()
+	{
+		$this->expectException(InvalidLazyValidationException::CLASS);
+		$this->expectExceptionMessage('this_is_not_a_boolean');
+
+		try {
+			Validate::lazy(['key' => 'dfdf'])
+				->that('key', 'this_is_not_a_boolean')->boolean()
+				->execute();
+		}
+		catch(InvalidLazyValidationException $error) {
+			$this->assertSame('key', $error->getErrors()[0]->getKey());
+			throw $error;
+		}
+	}
 }
