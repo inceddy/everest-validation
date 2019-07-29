@@ -16,7 +16,7 @@ use Everest\Validation\InvalidValidationException;
 class TypeClosure extends Type {
 
 
-	public function __invoke($value, $message = null, string $key = null, \Closure $handler)
+	public function __invoke($value, \Closure $handler, $message = null, string $key = null)
 	{
 		return $handler($value, $message, $key);
 	}
