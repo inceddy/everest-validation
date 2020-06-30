@@ -21,6 +21,10 @@ class TypeDateTimeImmutable extends Type {
 
 	public function __invoke($value, $format, $message = null, string $key = null)
 	{
+		if ($value instanceof \DateTimeImmutable) {
+			return $value;
+		}
+
 		$dateTime = \DateTimeImmutable::createFromFormat(
 			Validation::String($format),
 			Validation::String($value)

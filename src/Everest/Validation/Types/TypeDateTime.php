@@ -19,8 +19,12 @@ class TypeDateTime extends Type {
 	public static $errorName = 'invalid_datetime';
 	public static $errorMessage = '%s is not a valid date of format %s.';
 
-	public function __invoke($value, $format, $message = null, string $key = null)
+	public function __invoke($value, $format = \DateTime::ATOM, $message = null, string $key = null)
 	{
+		if ($value instanceof \DateTime) {
+			return $value;
+		}
+
 		$dateTime = \DateTime::createFromFormat(
 			Validation::String($format),
 			Validation::String($value)
