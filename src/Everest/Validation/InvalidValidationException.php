@@ -36,4 +36,16 @@ class InvalidValidationException extends \InvalidArgumentException
 	{
 		return $this->key;
 	}
+
+	public function merge(InvalidValidationException $error) : InvalidLazyValidationException
+	{
+		if ($error instanceof InvalidLazyValidationException) {
+			return $error->merge($this);
+		}
+
+		return InvalidLazyValidationException::fromErrors([
+			$this,
+			$error
+		]);
+	}
 }

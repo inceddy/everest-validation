@@ -51,4 +51,13 @@ class InvalidLazyValidationException extends InvalidValidationException
 
 		return $errors;
 	}
+
+	public function merge(InvalidValidationException $error) : InvalidLazyValidationException
+	{
+		if ($error instanceof InvalidLazyValidationException) {
+			return self::fromErrors(array_merge($this->errors, $error->getErrors()));
+		}
+
+		return self::fromErrors(array_merge($this->errors, [$error]));
+	}
 }
