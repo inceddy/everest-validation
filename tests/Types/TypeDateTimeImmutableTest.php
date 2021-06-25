@@ -11,6 +11,12 @@ class TypeDateTimeImmutableTest extends \PHPUnit\Framework\TestCase {
 		$this->assertSame('2018.02.08', $value->format('Y.m.d'));
 	}
 
+	public function testMutableConversion()
+	{
+		$value = (new TypeDateTimeImmutable)(new \DateTime('now'));
+		$this->assertInstanceOf(\DateTimeImmutable::class, $value);
+	}
+
 	public function testInvalidInput()
 	{
 		$this->expectException(InvalidValidationException::CLASS);

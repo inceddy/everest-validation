@@ -3,7 +3,7 @@
 /*
  * This file is part of Everest.
  *
- * (c) 2018 Philipp Steingrebe <development@steingrebe.de>
+ * (c) 2021 Philipp Steingrebe <development@steingrebe.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -19,10 +19,14 @@ class TypeDateTimeImmutable extends Type {
 	public static $errorName = 'invalid_datetime';
 	public static $errorMessage = '%s is not a valid date of format %s.';
 
-	public function __invoke($value, $format, $message = null, string $key = null)
+	public function __invoke($value, $format = \DateTime::ATOM, $message = null, string $key = null)
 	{
 		if ($value instanceof \DateTimeImmutable) {
 			return $value;
+		}
+
+		if ($value instanceof \DateTime) {
+			return \DateTimeImmutable::createFromMutable($value);
 		}
 
 		$dateTime = \DateTimeImmutable::createFromFormat(
