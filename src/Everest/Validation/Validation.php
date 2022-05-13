@@ -16,44 +16,44 @@ final class Validation implements \ArrayAccess {
 
 	private static $typeMap = [
 		// String related
-		'string'            => Types\TypeString::CLASS,
-		'length'            => Types\TypeLength::CLASS,
-		'lengthbetween'     => Types\TypeLengthBetween::CLASS,
-		'lengthmax'         => Types\TypeLengthMax::CLASS,
-		'lengthmin'         => Types\TypeLengthMin::CLASS,
+		'string'            => Types\TypeString::class,
+		'length'            => Types\TypeLength::class,
+		'lengthbetween'     => Types\TypeLengthBetween::class,
+		'lengthmax'         => Types\TypeLengthMax::class,
+		'lengthmin'         => Types\TypeLengthMin::class,
 		'pattern'           => Types\TypePattern::class,
 
 		// Logic
-		'notempty'          => Types\TypeNotEmpty::CLASS,
+		'notempty'          => Types\TypeNotEmpty::class,
 
 		// Date
-		'datetime'          => Types\TypeDateTime::CLASS,
-		'datetimeimmutable' => Types\TypeDateTimeImmutable::CLASS,
+		'datetime'          => Types\TypeDateTime::class,
+		'datetimeimmutable' => Types\TypeDateTimeImmutable::class,
 
 		// Numerical
-		'integer'           => Types\TypeInteger::CLASS,
-		'float'             => Types\TypeFloat::CLASS,
-		'between'           => Types\TypeBetween::CLASS,
-		'max'               => Types\TypeMax::CLASS,
-		'min'               => Types\TypeMin::CLASS,
+		'integer'           => Types\TypeInteger::class,
+		'float'             => Types\TypeFloat::class,
+		'between'           => Types\TypeBetween::class,
+		'max'               => Types\TypeMax::class,
+		'min'               => Types\TypeMin::class,
 
 		// Array related
-		'array'             => Types\TypeArray::CLASS,
-		'enum'              => Types\TypeEnum::CLASS,
-		'keyexists'         => Types\TypeKeyExists::CLASS,
+		'array'             => Types\TypeArray::class,
+		'enum'              => Types\TypeEnum::class,
+		'keyexists'         => Types\TypeKeyExists::class,
 
 		// Boolean
-		'boolean'           => Types\TypeBoolean::CLASS,
+		'boolean'           => Types\TypeBoolean::class,
 
 		// Other
-		'null'              => Types\TypeNull::CLASS,
-		'closure'           => Types\TypeClosure::CLASS,
+		'null'              => Types\TypeNull::class,
+		'closure'           => Types\TypeClosure::class,
 
 		// Filter
-		'trim'              => Filter\FilterTrim::CLASS,
-		'lowercase'         => Filter\FilterLowerCase::CLASS,
-		'uppercase'         => Filter\FilterUpperCase::CLASS,
-		'striptags'         => Filter\FilterStripTags::CLASS
+		'trim'              => Filter\FilterTrim::class,
+		'lowercase'         => Filter\FilterLowerCase::class,
+		'uppercase'         => Filter\FilterUpperCase::class,
+		'striptags'         => Filter\FilterStripTags::class
 	];
 
 
@@ -99,9 +99,9 @@ final class Validation implements \ArrayAccess {
 				));
 			}
 
-			if (!is_subclass_of($type, Type::CLASS)) {
+			if (!is_subclass_of($type, Type::class)) {
 				throw new \InvalidArgumentException(sprintf(
-					'Type-class %s does extend from %s.', $type,	Type::CLASS
+					'Type-class %s does extend from %s.', $type,	Type::class
 				));
 			}
 
@@ -123,7 +123,7 @@ final class Validation implements \ArrayAccess {
 
 			if (!$type instanceof Type) {
 				throw new \InvalidArgumentException(sprintf(
-					'Type-instance %s does extend from %s.', get_class($type),	Type::CLASS
+					'Type-instance %s does extend from %s.', get_class($type),	Type::class
 				));
 			}
 
@@ -209,22 +209,22 @@ final class Validation implements \ArrayAccess {
 		}
 	}
 
-	public function offsetExists($offset)
+	public function offsetExists(mixed $offset) : bool
 	{
 		return isset(self::$typeMap[$offset]);
 	}
 
-	public function offsetGet ($offset)
+	public function offsetGet (mixed $offset) : mixed
 	{
 		return self::$typeMap[$offset];
 	}
 
-	public function offsetSet($offset, $value) 
+	public function offsetSet(mixed $offset, mixed $value) : void 
 	{
 		throw new \Exception('Not implemented');
 	}
 
-	public function offsetUnset($offset)
+	public function offsetUnset(mixed $offset) : void
 	{
 		throw new \Exception('Not implemented');
 	}
