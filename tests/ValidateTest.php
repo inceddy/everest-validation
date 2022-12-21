@@ -316,4 +316,30 @@ class ValidateTest extends \PHPUnit\Framework\TestCase {
 			throw $error;
 		}
 	}
+
+	public function testSometimes()
+	{
+			$data = Validate::lazy(['foo' => 1])
+				->that('foo')
+					->integer()
+				->that('bar')
+					->sometimes()
+					->optional(1)
+					->integer()
+				->execute();
+
+			$this->assertSame(['foo' => 1], $data);
+
+			$data = Validate::lazy(['foo' => 1, 'bar' => 2])
+				->that('foo')
+					->notEmpty()
+				->that('bar')
+					->sometimes()
+					->optional(1)
+					->integer()
+				->execute();
+
+
+			$this->assertSame(['foo' => 1, 'bar' => 2], $data);
+	}
 }

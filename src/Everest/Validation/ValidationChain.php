@@ -37,6 +37,13 @@ class ValidationChain {
 	private $optional = false;
 
 	/**
+	 * Indecates if the chain should only be executed when value is present
+	 * @var        bool
+	 */
+
+	private $sometimes = false;
+
+	/**
 	 * Default value if the cain is optional
 	 * If the default value is callable, it is called
 	 * If the default value differs from null it is validated by the cain
@@ -108,7 +115,7 @@ class ValidationChain {
 
 	/**
 	 * Allow this chain to be
-	 * true if value is `null`.
+	 * true if value is equal to default value.
 	 */
 	
 	public function optional()
@@ -124,6 +131,15 @@ class ValidationChain {
 		}
 
 		$this->optional = true;
+	}
+
+	/**
+	 * Allow this chain to be
+	 * true if value is not present.
+	 */
+	public function sometimes()
+	{
+		$this->sometimes = true;
 	}
 
 
@@ -159,6 +175,10 @@ class ValidationChain {
 	public function __invoke($value, $index = null)
 	{
 		if ($value === Undefined::instance()) {
+			if ($this->sometimes) {
+				return $value;
+			}
+
 			if ($this->optional) {
 				return $this->default;
 			}

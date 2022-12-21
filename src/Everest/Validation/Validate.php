@@ -162,6 +162,12 @@ final class Validate {
 		return $this;
 	}
 
+	public function sometimes()
+	{
+		$this->currentChain->sometimes();
+		return $this;
+	}
+
 	public function all()
 	{
 		$this->currentChain->all();
