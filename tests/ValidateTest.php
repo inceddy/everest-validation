@@ -342,4 +342,23 @@ class ValidateTest extends \PHPUnit\Framework\TestCase {
 
 			$this->assertSame(['foo' => 1, 'bar' => 2], $data);
 	}
+
+	public function testAllow()
+	{
+			$data = Validate::lazy(['foo' => 1])
+				->that('foo')
+					->allow('')
+					->integer()
+				->execute();
+
+			$this->assertSame(['foo' => 1], $data);
+
+			$data = Validate::lazy(['foo' => ''])
+				->that('foo')
+					->allow('')
+					->integer()
+				->execute();
+
+			$this->assertSame(['foo' => ''], $data);
+	}
 }

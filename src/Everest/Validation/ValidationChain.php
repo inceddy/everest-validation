@@ -44,6 +44,13 @@ class ValidationChain {
 	private $sometimes = false;
 
 	/**
+	 * Array of allowed values
+	 * @var        array
+	 */
+
+	private $allow = [];
+
+	/**
 	 * Default value if the cain is optional
 	 * If the default value is callable, it is called
 	 * If the default value differs from null it is validated by the cain
@@ -142,6 +149,17 @@ class ValidationChain {
 		$this->sometimes = true;
 	}
 
+	/**
+	 * Allow this chain to be
+	 * true if it matches any allowed value
+	 *
+	 * @param      <type>  ...$values  The values
+	 */
+	public function allow(...$values)
+	{
+		$this->allow = $values;
+	}
+
 
 	/**
 	 * Adds a new validation clusore the the 
@@ -190,6 +208,13 @@ class ValidationChain {
 		// This avoids chains like: `->that('foo')->optional(null)->string()->or()->null()		
 		if ($this->optional && $this->default === $value) {
 			return $value;
+		}
+
+		// If value is allowed return it
+		foreach ($this->allow as $allowed) {
+			if ($value === $allowed) {
+				return $value;
+			}
 		}
 
 		foreach ($this->validations as $validation) {

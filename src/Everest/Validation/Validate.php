@@ -168,6 +168,12 @@ final class Validate {
 		return $this;
 	}
 
+	public function allow(...$values)
+	{
+		$this->currentChain->allow(...$values);
+		return $this;
+	}
+
 	public function all()
 	{
 		$this->currentChain->all();
